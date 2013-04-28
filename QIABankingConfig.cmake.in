@@ -1,0 +1,14 @@
+# - Config file for the QtGetOpt package
+# It defines the following variables
+#  QIABANKING_INCLUDE_DIRS - include directory for QtGetOpt
+#  QIABANKING_LIBRARIES   - libraries to link against
+
+# Compute paths
+get_filename_component(QIABANKING_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+include("${QIABANKING_CMAKE_DIR}/QIABankingTargets.cmake")
+
+set(QIABANKING_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+# These are IMPORTED targets created by QIABankingTargets.cmake
+set(QIABANKING_LIBRARIES qiabanking)
