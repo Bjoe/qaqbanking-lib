@@ -51,7 +51,7 @@ AB_IMEXPORTER_ACCOUNTINFO *AccountInfo::getAbAccountInfo() const
 
 void AccountInfo::setter(void (*setFunction)(AB_IMEXPORTER_ACCOUNTINFO *,const char *), const QString &aString)
 {
-    QByteArray ascii = aString.toAscii();
+    QByteArray ascii = aString.toLocal8Bit();
     setFunction(abAccountInfo, ascii.constData());
 }
 

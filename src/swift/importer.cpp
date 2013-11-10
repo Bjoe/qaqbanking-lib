@@ -27,7 +27,7 @@ QList<Transaction *> Importer::importMt940Swift(const QString aFilename)
         return transactionList;
     }
 
-    const QByteArray ascii = aFilename.toAscii();
+    const QByteArray ascii = aFilename.toLocal8Bit();
     result = AB_Banking_ImportFileWithProfile(abBanking, "swift", imExporterContext, "SWIFT-MT940", 0, ascii.constData());
     if(result != 0) {
         return transactionList;
@@ -37,8 +37,8 @@ QList<Transaction *> Importer::importMt940Swift(const QString aFilename)
                 std::cout << "Export Log " << *log << std::endl;
     } */
 
-    const QByteArray bankCodeAscii = bankCode.toAscii();
-    const QByteArray accountNumberAscii = accountNumber.toAscii();
+    const QByteArray bankCodeAscii = bankCode.toLocal8Bit();
+    const QByteArray accountNumberAscii = accountNumber.toLocal8Bit();
     AB_IMEXPORTER_ACCOUNTINFO *accountInfo = AB_ImExporterContext_FindAccountInfo(
                 imExporterContext, bankCodeAscii.constData(), accountNumberAscii.constData());
 

@@ -31,7 +31,7 @@ void Transaction::setLocalAccountNumber(const QString &aLocalAccountNumber)
 
 void Transaction::setRemoteName(const QString &aRemoteName)
 {
-    QByteArray ascii = aRemoteName.toAscii();
+    QByteArray ascii = aRemoteName.toLocal8Bit();
     AB_Transaction_AddRemoteName(abTransaction, ascii.constData(), 0);
 }
 
@@ -53,7 +53,7 @@ void Transaction::setValue(double aValue)
 
 void Transaction::setPurpose(const QString &aPurpose)
 {
-    QByteArray ascii = aPurpose.toAscii();
+    QByteArray ascii = aPurpose.toLocal8Bit();
     AB_Transaction_AddPurpose(abTransaction, ascii.constData(), 0);
 }
 
@@ -69,7 +69,7 @@ AB_TRANSACTION *Transaction::getAbTransaction() const
 
 void Transaction::setter(void (*setFunction)(AB_TRANSACTION *, const char *), const QString &aString)
 {
-    QByteArray ascii = aString.toAscii();
+    QByteArray ascii = aString.toLocal8Bit();
     setFunction(abTransaction, ascii.constData());
 }
 

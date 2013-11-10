@@ -1,7 +1,12 @@
 
-set(MOC_HDRS
-    swift/transaction.h
-)
+if(NOT ${QT5})
+    set(MOC_HDRS
+        swift/transaction.h
+    )
+
+    qt4_wrap_cpp(MOC_OUTFILES ${MOC_HDRS})
+
+endif(NOT ${QT5})
 
 set(HEADERS
   accountinfobuilder.h
@@ -24,11 +29,12 @@ set(QT_SRCS
     swift/transaction.cpp
 )
 
-qt4_wrap_cpp(MOC_OUTFILES ${MOC_HDRS})
-
-include(${QT_USE_FILE})
 
 add_library(qiabanking STATIC ${QT_SRCS} ${MOC_OUTFILES})
+
+if(${QT5})
+    qt5_use_modules(qiabanking Core)
+endif(${QT5})
 
 set_target_properties(qiabanking PROPERTIES
   PUBLIC_HEADER "${HEADERS}")

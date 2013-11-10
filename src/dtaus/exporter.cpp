@@ -38,7 +38,7 @@ void Exporter::createDtausFile(const QString &aFilename)
         return;
     }
 
-    const QByteArray ascii = aFilename.toAscii();
+    const QByteArray ascii = aFilename.toLocal8Bit();
     result = AB_Banking_ExportToFile(abBanking, imExporterContext, "dtaus", "debitnote", ascii.constData());
     if(result != 0) {
  //       std::cerr << "Export Error " << result << std::endl;
@@ -54,7 +54,7 @@ void Exporter::set(void (*setFunction)(AB_IMEXPORTER_ACCOUNTINFO *, const char *
                       AB_IMEXPORTER_ACCOUNTINFO *anAccountInfo,
                       const QString &aString)
 {
-    const QByteArray ascii = aString.toAscii();
+    const QByteArray ascii = aString.toLocal8Bit();
     setFunction(anAccountInfo, ascii.constData());
 }
 
