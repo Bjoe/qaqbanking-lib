@@ -12,17 +12,15 @@ MACRO(qt_add_test testname testsrc)
 	  LIST(APPEND special_additional ${_additional})
      ENDFOREACH(_additional)
   
-     if(NOT ${QT5})
-        qt4_automoc(${test_${testname}_SRCS} ${special_additional})
-     endif(NOT ${QT5})
+     get_filename_component(_basename ${test_${testname}_SRCS} NAME_WE)
+     qt5_wrap_cpp(test_${testname}_MOC ${_basename}.h)
 
+     add_custom_target(moc_${testname}_target DEPENDS ${test_${testname}_MOC})
      add_executable(test_${testname} ${test_${testname}_SRCS} ${special_additional} ${test_additional})
-     target_link_libraries(test_${testname} ${test_additional_lib} ${QT_LIBRARIES})
+     add_dependencies(test_${testname} moc_${testname}_target)
 
-     if(${QT5})
-        qt5_use_modules(test_${testname} Test)
-     endif(${QT5})
-  
+     target_link_libraries(test_${testname} ${test_additional_lib} Qt5::Test)
+
      add_test(test${testname} ${EXECUTABLE_OUTPUT_PATH}/test_${testname})
 
 ENDMACRO()
@@ -35,23 +33,13 @@ MACRO(qt_test testname testsrc)
 	  LIST(APPEND special_additional ${_additional})
      ENDFOREACH(_additional)
 
-     if(${QT5})
-        qt5_wrap_cpp(test_${testname}_MOC ${test_${testname}_SRCS})
-     else(${QT5})
-        QT4_GET_MOC_FLAGS(moc_flags)
-        GET_FILENAME_COMPONENT(test_${testname}_SRCS ${test_${testname}_SRCS} ABSOLUTE)
-        QT4_MAKE_OUTPUT_FILE(${test_${testname}_SRCS} moc_ cpp test_${testname}_MOC)
-        QT4_CREATE_MOC_COMMAND(${test_${testname}_SRCS} ${test_${testname}_MOC} "${moc_flags}" "")
-     endif(${QT5})
+     qt5_wrap_cpp(test_${testname}_MOC ${test_${testname}_SRCS})
 
      add_custom_target(moc_${testname}_target DEPENDS ${test_${testname}_MOC})
      add_executable(test_${testname} ${test_${testname}_SRCS} ${special_additional} ${test_additional})
      add_dependencies(test_${testname} moc_${testname}_target)
-     target_link_libraries(test_${testname} ${test_additional_lib} ${QT_LIBRARIES})
 
-     if(${QT5})
-        qt5_use_modules(test_${testname} Test)
-     endif(${QT5})
+     target_link_libraries(test_${testname} ${test_additional_lib} Qt5::Test)
   
      add_test(test${testname} ${EXECUTABLE_OUTPUT_PATH}/test_${testname})
 ENDMACRO()

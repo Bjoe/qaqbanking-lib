@@ -7,9 +7,11 @@ include(BuildUtil)
 
 # The version number.
 set (QIABanking_VERSION_MAJOR 0)
-set (QIABanking_VERSION_MINOR 1)
+set (QIABanking_VERSION_MINOR 2)
 set (QIABanking_VERSION_PATCH 0)
 set (QIABanking_VERSION ${QIABanking_VERSION_MAJOR}.${QIABanking_VERSION_MINOR}.${QIABanking_VERSION_PATCH})
+
+add_definitions(-std=c++11)
 
 # http://www.cmake.org/Wiki/CMake/Tutorials/How_to_create_a_ProjectConfig.cmake_file
 # Offer the user the choice of overriding the installation directories
@@ -30,19 +32,11 @@ foreach(p LIB INCLUDE CMAKE)
   endif()
 endforeach()
 
-SET(QT5 "false" CACHE BOOL "Qt5 build")
-if(${QT5})
-    # Instruct CMake to run moc automatically when needed.
-    set(CMAKE_AUTOMOC ON)
+# Instruct CMake to run moc automatically when needed.
+set(CMAKE_AUTOMOC ON)
 
-    # cmake example from http://qt-project.org/doc/qt-5.1/qtdoc/cmake-manual.html
-    find_package(Qt5Core)
-
-else(${QT5})
-    find_package(Qt4 4.8 REQUIRED QtCore)
-    include(${QT_USE_FILE})
-
-endif(${QT5})
+# cmake example from http://qt-project.org/doc/qt-5.1/qtdoc/cmake-manual.html
+find_package(Qt5Core)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(AQB REQUIRED aqbanking)

@@ -6,18 +6,10 @@ endif(CMAKE_CROSSCOMPILING)
 pkg_check_modules(GWEN REQUIRED gwenhywfar)
 find_package(QtTestUtil)
 
-if(${QT5})
-    # Instruct CMake to run moc automatically when needed.
-    set(CMAKE_AUTOMOC OFF)
+set(CMAKE_AUTOMOC OFF)
 
-    # cmake example from http://qt-project.org/doc/qt-5.1/qtdoc/cmake-manual.html
-    find_package(Qt5Test)
-
-else(${QT5})
-    find_package(Qt4 4.8 REQUIRED QtTest)
-    include(${QT_USE_FILE})
-
-endif(${QT5})
+# cmake example from http://qt-project.org/doc/qt-5.1/qtdoc/cmake-manual.html
+find_package(Qt5Test)
 
 set(MT940TESTFILE "${PROJECT_SOURCE_DIR}/mt940.txt")
 
