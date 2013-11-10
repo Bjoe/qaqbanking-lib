@@ -1,93 +1,127 @@
 #include "transaction.h"
 
-#include <time.h>
-
-#include <gwenhywfar/gwentime.h>
-#include <gwenhywfar/stringlist.h>
-#include <aqbanking/value.h>
-
 namespace qiabanking {
 namespace swift {
 
-Transaction::Transaction(AB_TRANSACTION *aTransaction)
-    : transaction(aTransaction)
+struct Transaction::TransactionImpl {
+    QString m_remoteName;
+    QString m_remoteBankCode;
+    QString m_remoteAccountNumber;
+    QString m_purpose;
+    QString m_transactionText;
+    QString m_primanota;
+    QDate m_valuta;
+    QDate m_date;
+    int m_transactionCode;
+    double m_value;
+};
+
+Transaction::Transaction() : m_p(new TransactionImpl)
 {
 }
 
 Transaction::~Transaction()
 {
-    AB_Transaction_free(transaction);
+}
+
+void Transaction::setRemoteName(QString remoteName)
+{
+    m_p->m_remoteName = remoteName;
 }
 
 QString Transaction::getRemoteName() const
 {
-    const GWEN_STRINGLIST *stringList = AB_Transaction_GetRemoteName(transaction);
-    GWEN_STRINGLISTENTRY *stringListEntry = GWEN_StringList_FirstEntry(stringList);
-    QString name;
-    while(stringListEntry) {
-        QString line(GWEN_StringListEntry_Data(stringListEntry));
-        name.append(line);
-        stringListEntry = GWEN_StringListEntry_Next(stringListEntry);
-    }
-    return name;
+    return m_p->m_remoteName;
+}
+
+void Transaction::setRemoteBankCode(QString remoteBankCode)
+{
+    m_p->m_remoteBankCode = remoteBankCode;
 }
 
 QString Transaction::getRemoteBankCode() const
 {
-    return QString(AB_Transaction_GetRemoteBankCode(transaction));
+    return m_p->m_remoteBankCode;
+}
+
+void Transaction::setRemoteAccountNumber(QString accountNumber)
+{
+    m_p->m_remoteAccountNumber = accountNumber;
 }
 
 QString Transaction::getRemoteAccountNumber() const
 {
-    return QString(AB_Transaction_GetRemoteAccountNumber(transaction));
+    return m_p->m_remoteAccountNumber;
+}
+
+void Transaction::setValue(double value)
+{
+    m_p->m_value = value;
 }
 
 double Transaction::getValue() const
 {
-    const AB_VALUE *value = AB_Transaction_GetValue(transaction);
-    return AB_Value_GetValueAsDouble(value);
+    return m_p->m_value;
+}
+
+void Transaction::setValutaDate(QDate date)
+{
+    m_p->m_valuta = date;
 }
 
 QDate Transaction::getValutaDate() const
 {
-    const GWEN_TIME *valutaDate = AB_Transaction_GetValutaDate(transaction);
-    tm time = GWEN_Time_toTm(valutaDate);
-    return QDate(time.tm_year + 1900, time.tm_mon + 1, time.tm_mday);
+    return m_p->m_valuta;
+}
+
+void Transaction::setDate(QDate date)
+{
+    m_p->m_date = date;
 }
 
 QDate Transaction::getDate() const
 {
-    const GWEN_TIME *date = AB_Transaction_GetDate(transaction);
-    tm time = GWEN_Time_toTm(date);
-    return QDate(time.tm_year + 1900, time.tm_mon + 1, time.tm_mday);
+    return m_p->m_date;
+}
+
+void Transaction::setPurpose(QString purpose)
+{
+    m_p->m_purpose = purpose;
 }
 
 QString Transaction::getPurpose() const
 {
-    const GWEN_STRINGLIST *stringList = AB_Transaction_GetPurpose(transaction);
-    GWEN_STRINGLISTENTRY *stringListEntry = GWEN_StringList_FirstEntry(stringList);
-    QString purpose;
-    while(stringListEntry) {
-        QString line(GWEN_StringListEntry_Data(stringListEntry));
-        purpose.append(line);
-        stringListEntry = GWEN_StringListEntry_Next(stringListEntry);
-    }
-    return purpose;
+    return m_p->m_purpose;
+}
+
+void Transaction::setTransactionText(QString text)
+{
+    m_p->m_transactionText = text;
 }
 
 QString Transaction::getTransactionText() const
 {
-    return QString(AB_Transaction_GetTransactionText(transaction));
+    return m_p->m_transactionText;
+}
+
+void Transaction::setTransactionCode(int code)
+{
+    m_p->m_transactionCode = code;
 }
 
 int Transaction::getTransactionCode() const
 {
-    return AB_Transaction_GetTransactionCode(transaction);
+    return m_p->m_transactionCode;
+}
+
+void Transaction::setPrimanota(QString primanota)
+{
+    m_p->m_primanota = primanota;
 }
 
 QString Transaction::getPrimanota() const
 {
-    return QString(AB_Transaction_GetPrimanota(transaction));
+    return m_p->m_primanota;
 }
 
 } // namespace swift

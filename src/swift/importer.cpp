@@ -2,8 +2,35 @@
 
 #include <QByteArray>
 
+#include <time.h>
+
+#include <aqbanking/transaction.h>
+#include <gwenhywfar/gwentime.h>
+#include <gwenhywfar/stringlist.h>
+#include <aqbanking/value.h>
+
 namespace qiabanking {
 namespace swift {
+
+static QString convertToString(const GWEN_STRINGLIST* stringList) {
+    GWEN_STRINGLISTENTRY *stringListEntry = GWEN_StringList_FirstEntry(stringList);
+    QString name;
+    while(stringListEntry) {
+        QString line(GWEN_StringListEntry_Data(stringListEntry));
+        name.append(line);
+        stringListEntry = GWEN_StringListEntry_Next(stringListEntry);
+    }
+    return name;
+}
+
+static double convertToDouble(const AB_VALUE* value) {
+    return AB_Value_GetValueAsDouble(value);
+}
+
+static QDate convertToDate(const GWEN_TIME* date) {
+    tm time = GWEN_Time_toTm(date);
+    return QDate(time.tm_year + 1900, time.tm_mon + 1, time.tm_mday);
+}
 
 Importer::Importer(const QString aBankCode, const QString anAccountNumber)
     : imExporterContext(0), bankCode(aBankCode), accountNumber(anAccountNumber)
@@ -45,8 +72,21 @@ QList<Transaction *> Importer::importMt940Swift(const QString aFilename)
     if(accountInfo != 0) {
         AB_TRANSACTION *abTransaction = AB_ImExporterAccountInfo_GetFirstTransaction(accountInfo);
         while(abTransaction != 0) {
-            Transaction *transaction = new Transaction(abTransaction);
+            Transaction *transaction = new Transaction();
+            transaction->setRemoteName(convertToString(AB_Transaction_GetRemoteName(abTransaction)));
+            transaction->setRemoteBankCode(QString(AB_Transaction_GetRemoteBankCode(abTransaction)));
+            transaction->setRemoteAccountNumber(QString(AB_Transaction_GetRemoteAccountNumber(abTransaction)));
+            transaction->setValue(convertToDouble(AB_Transaction_GetValue(abTransaction)));
+            transaction->setValutaDate(convertToDate(AB_Transaction_GetValutaDate(abTransaction)));
+            transaction->setDate(convertToDate(AB_Transaction_GetDate(abTransaction)));
+            transaction->setPurpose(convertToString(AB_Transaction_GetPurpose(abTransaction)));
+            transaction->setTransactionText(QString(AB_Transaction_GetTransactionText(abTransaction)));
+            transaction->setTransactionCode(AB_Transaction_GetTransactionCode(abTransaction));
+            transaction->setPrimanota(QString(AB_Transaction_GetPrimanota(abTransaction)));
+
             transactionList.append(transaction);
+
+            AB_Transaction_free(abTransaction);
             abTransaction = AB_ImExporterAccountInfo_GetNextTransaction(accountInfo);
         }
     } else {
