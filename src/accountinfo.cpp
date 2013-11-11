@@ -36,7 +36,7 @@ void AccountInfo::setAccountNumber(const QString &anAccountNumber)
 
 void AccountInfo::addTransaction(const dtaus::Transaction &aTransaction)
 {
-    AB_ImExporterAccountInfo_AddTransaction(abAccountInfo, aTransaction.getAbTransaction());
+    AB_ImExporterAccountInfo_AddTransaction(abAccountInfo, 0); //aTransaction.getAbTransaction());
 }
 
 bool AccountInfo::isValid() const

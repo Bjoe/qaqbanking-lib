@@ -1,35 +1,44 @@
 #ifndef QIABANKING_TRANSACTION_H
 #define QIABANKING_TRANSACTION_H
 
-#include <QString>
+#include <memory>
 
-#include <aqbanking/transaction.h>
+#include <QObject>
+#include <QString>
 
 namespace qiabanking {
 namespace dtaus {
 
-class Transaction
+class Transaction : public QObject
 {
+    Q_OBJECT
+
 public:
     Transaction();
     virtual ~Transaction();
 
-    void setLocalName(const QString &aLocalName);
-    void setLocalBankCode(const QString &aLocalBankCode);
-    void setLocalAccountNumber(const QString &aLocalAccountNumber);
-    void setRemoteName(const QString &aRemoteName);
-    void setRemoteBankCode(const QString &aRemoteBankeCode);
-    void setRemoteAccountNumber(const QString &aRemoteAccountNumber);
-    void setValue(double aValue);
-    void setPurpose(const QString &aPurpose);
-    void setTextKey(int aTextKey);
-
-    AB_TRANSACTION *getAbTransaction() const;
+    QString localName() const;
+    void setLocalName(QString localName);
+    QString localBankCode() const;
+    void setLocalBankCode(QString localBankCode);
+    QString localAccountNumber() const;
+    void setLocalAccountNumber(QString localAccountNumber);
+    QString remoteName() const;
+    void setRemoteName(QString remoteName);
+    QString remoteBankCode() const;
+    void setRemoteBankCode(QString remoteBankCode);
+    QString remoteAccountNumber() const;
+    void setRemoteAccountNumber(QString remoteAccountNumber);
+    double value() const;
+    void setValue(double value);
+    QString purpose() const;
+    void setPurpose(QString purpose);
+    int textKey() const;
+    void setTextKey(int textKey);
 
 private:
-    AB_TRANSACTION *abTransaction;
-
-    void setter(void (*setFunction)(AB_TRANSACTION *, const char *), const QString &aString);
+    struct TransactionImpl;
+    std::unique_ptr<TransactionImpl> m_p;
 };
 
 }

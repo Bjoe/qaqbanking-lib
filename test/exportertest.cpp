@@ -2,6 +2,7 @@
 #include <QDate>
 #include <QFile>
 #include <QTextStream>
+#include <QSharedPointer>
 
 #include "testcoverageobject.h"
 
@@ -30,13 +31,13 @@ void ExporterTest::testCreateExporter()
             .withAccountNumber("123456")
             .build();
 
-    qiabanking::dtaus::Transaction transaction;
-    transaction.setLocalName("Dorf e.V.");
-    transaction.setLocalBankCode("30050110");
-    transaction.setLocalAccountNumber("123456");
-    transaction.setRemoteBankCode("40050220");
-    transaction.setRemoteAccountNumber("4321");
-    transaction.setValue(15);
+    QSharedPointer<qiabanking::dtaus::Transaction> transaction = QSharedPointer<qiabanking::dtaus::Transaction>(new qiabanking::dtaus::Transaction);
+    transaction->setLocalName("Dorf e.V.");
+    transaction->setLocalBankCode("30050110");
+    transaction->setLocalAccountNumber("123456");
+    transaction->setRemoteBankCode("40050220");
+    transaction->setRemoteAccountNumber("4321");
+    transaction->setValue(15);
     exporter.addTransaction(transaction);
 
     exporter.createDtausFile("DTAUS0.txt");

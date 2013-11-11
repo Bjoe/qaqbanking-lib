@@ -126,3 +126,5 @@ QString Transaction::getPrimanota() const
 
 } // namespace swift
 } // namespace qiabanking
+
+#include "swift/moc_transaction.cpp"

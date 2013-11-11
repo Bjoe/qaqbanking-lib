@@ -2,6 +2,7 @@
 #define EXPORTER_H
 
 #include <QString>
+#include <QSharedPointer>
 
 #include <aqbanking/imexporter.h>
 
@@ -16,15 +17,11 @@ public:
     Exporter(const QString &anAccountNumber, const QString &aBankName, const QString &aBankCode, const QString &aCurrency);
     ~Exporter();
 
-    void addTransaction(const Transaction &aTransaction);
+    void addTransaction(const QSharedPointer<Transaction> transaction);
     void createDtausFile(const QString &aFilename);
 
 private:
     AB_IMEXPORTER_CONTEXT *imExporterContext;
-
-    void set(void (*setFunction)(AB_IMEXPORTER_ACCOUNTINFO *, const char *),
-           AB_IMEXPORTER_ACCOUNTINFO *anAccountInfo,
-           const QString &aString);
 };
 
 }

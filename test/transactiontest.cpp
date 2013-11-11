@@ -1,6 +1,8 @@
 #include <QtTest/QtTest>
 #include "testcoverageobject.h"
 
+#include <QSharedPointer>
+
 #include "dtaus/transactionbuilder.h"
 #include "dtaus/transaction.h"
 #include <aqbanking/transaction.h>
@@ -21,7 +23,7 @@ private slots:
 
 void TransactionTest::testDtausTransaction()
 {
-    qiabanking::dtaus::Transaction transaction =
+    QSharedPointer<qiabanking::dtaus::Transaction> transaction =
             qiabanking::dtaus::TransactionBuilder()
             .withLocalName("Foo")
             .withLocalBankCode("123456")
@@ -34,21 +36,15 @@ void TransactionTest::testDtausTransaction()
             .withTextKey(5)
             .build();
 
-    AB_TRANSACTION *abTransaction = transaction.getAbTransaction();
-
-    QCOMPARE(AB_Transaction_GetLocalName(abTransaction), "Foo");
-    QCOMPARE(AB_Transaction_GetLocalBankCode(abTransaction), "123456");
-    QCOMPARE(AB_Transaction_GetLocalAccountNumber(abTransaction), "654321");
-    const GWEN_STRINGLIST *stringList = AB_Transaction_GetRemoteName(abTransaction);
-    unsigned int i = 1;
-    QCOMPARE(GWEN_StringList_Count(stringList), i);
-    QCOMPARE(GWEN_StringList_StringAt(stringList, 0), "Peter, Pan");
-    QCOMPARE(AB_Transaction_GetRemoteBankCode(abTransaction), "0987");
-    QCOMPARE(AB_Transaction_GetRemoteAccountNumber(abTransaction), "7890");
-    QCOMPARE(AB_Transaction_GetTextKey(abTransaction), 5);
-    const AB_VALUE* value = AB_Transaction_GetValue(abTransaction);
-    double z = 15.00;
-    QCOMPARE(AB_Value_GetValueAsDouble(value), z);
+    QCOMPARE(transaction->localName(), QString("Foo"));
+    QCOMPARE(transaction->localBankCode(), QString("123456"));
+    QCOMPARE(transaction->localAccountNumber(), QString("654321"));
+    QCOMPARE(transaction->remoteName(), QString("Peter, Pan"));
+    QCOMPARE(transaction->remoteBankCode(), QString("0987"));
+    QCOMPARE(transaction->remoteAccountNumber(), QString("7890"));
+    QCOMPARE(transaction->value(), 15.0);
+    QCOMPARE(transaction->purpose(), QString("Beitrag"));
+    QCOMPARE(transaction->textKey(), 5);
 }
 
 }

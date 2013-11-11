@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QByteArray>
+#include <QSharedPointer>
 
 #include <aqbanking/value.h>
 
@@ -14,70 +15,70 @@ namespace dtaus {
 class TransactionBuilder
 {
 public:
-    TransactionBuilder() : transaction()
+    TransactionBuilder() : transaction(QSharedPointer<Transaction>(new Transaction))
     {}
 
     TransactionBuilder& withLocalName(const QString &aLocalName)
     {
-        transaction.setLocalName(aLocalName);
+        transaction->setLocalName(aLocalName);
         return *this;
     }
 
     TransactionBuilder& withLocalBankCode(const QString &aLocalBankCode)
     {
-        transaction.setLocalBankCode(aLocalBankCode);
+        transaction->setLocalBankCode(aLocalBankCode);
         return *this;
     }
 
     TransactionBuilder& withLocalAccountNumber(const QString &aLocalAccountNumber)
     {
-        transaction.setLocalAccountNumber(aLocalAccountNumber);
+        transaction->setLocalAccountNumber(aLocalAccountNumber);
         return *this;
     }
 
     TransactionBuilder& withRemoteName(const QString &aRemoteName)
     {
-        transaction.setRemoteName(aRemoteName);
+        transaction->setRemoteName(aRemoteName);
         return *this;
     }
 
     TransactionBuilder& withRemoteBankCode(const QString &aRemoteBankCode)
     {
-        transaction.setRemoteBankCode(aRemoteBankCode);
+        transaction->setRemoteBankCode(aRemoteBankCode);
         return *this;
     }
 
     TransactionBuilder& withRemoteAccountNumber(const QString &aRemoteAccountNumber)
     {
-        transaction.setRemoteAccountNumber(aRemoteAccountNumber);
+        transaction->setRemoteAccountNumber(aRemoteAccountNumber);
         return *this;
     }
 
     TransactionBuilder& withValue(double aValue)
     {
-        transaction.setValue(aValue);
+        transaction->setValue(aValue);
         return *this;
     }
 
     TransactionBuilder& withPurpose(const QString &aPurpose)
     {
-        transaction.setPurpose(aPurpose);
+        transaction->setPurpose(aPurpose);
         return *this;
     }
 
     TransactionBuilder& withTextKey(int aTextKey)
     {
-        transaction.setTextKey(aTextKey);
+        transaction->setTextKey(aTextKey);
         return *this;
     }
 
-    Transaction build()
+    QSharedPointer<Transaction> build()
     {
         return transaction;
     }
 
 private:
-   Transaction transaction;
+   QSharedPointer<Transaction> transaction;
 };
 
 }

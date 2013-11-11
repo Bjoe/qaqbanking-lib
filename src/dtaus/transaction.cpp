@@ -1,77 +1,120 @@
 #include "transaction.h"
 
-#include <QByteArray>
-
 namespace qiabanking {
 namespace dtaus {
 
-Transaction::Transaction() : abTransaction(0)
+struct Transaction::TransactionImpl {
+    QString m_localName;
+    QString m_localBankCode;
+    QString m_localBankAccountNumber;
+    QString m_remoteName;
+    QString m_remoteBankCode;
+    QString m_remoteBankAccountNumber;
+    QString m_purpose;
+    double m_value;
+    int m_textKey;
+};
+
+
+Transaction::Transaction() : m_p(new TransactionImpl)
 {
-   abTransaction = AB_Transaction_new();
 }
 
 Transaction::~Transaction()
 {
 }
 
-void Transaction::setLocalName(const QString &aLocalName)
+QString Transaction::localName() const
 {
-    setter(&AB_Transaction_SetLocalName, aLocalName);
+    return m_p->m_localName;
 }
 
-void Transaction::setLocalBankCode(const QString &aLocalBankCode)
+void Transaction::setLocalName(QString localName)
 {
-    setter(&AB_Transaction_SetLocalBankCode, aLocalBankCode);
+    m_p->m_localName = localName;
 }
 
-void Transaction::setLocalAccountNumber(const QString &aLocalAccountNumber)
+QString Transaction::localBankCode() const
 {
-    setter(&AB_Transaction_SetLocalAccountNumber, aLocalAccountNumber);
+    return m_p->m_localBankCode;
 }
 
-void Transaction::setRemoteName(const QString &aRemoteName)
+void Transaction::setLocalBankCode(QString localBankCode)
 {
-    QByteArray ascii = aRemoteName.toLocal8Bit();
-    AB_Transaction_AddRemoteName(abTransaction, ascii.constData(), 0);
+    m_p->m_localBankCode = localBankCode;
 }
 
-void Transaction::setRemoteBankCode(const QString &aRemoteBankCode)
+QString Transaction::localAccountNumber() const
 {
-    setter(&AB_Transaction_SetRemoteBankCode, aRemoteBankCode);
+    return m_p->m_localBankAccountNumber;
 }
 
-void Transaction::setRemoteAccountNumber(const QString &aRemoteAccountNumber)
+void Transaction::setLocalAccountNumber(QString localAccountNumber)
 {
-    setter(&AB_Transaction_SetRemoteAccountNumber, aRemoteAccountNumber);
+    m_p->m_localBankAccountNumber = localAccountNumber;
 }
 
-void Transaction::setValue(double aValue)
+QString Transaction::remoteName() const
 {
-    const AB_VALUE* value = AB_Value_fromDouble(aValue);
-    AB_Transaction_SetValue(abTransaction, value);
+    return m_p->m_remoteName;
 }
 
-void Transaction::setPurpose(const QString &aPurpose)
+void Transaction::setRemoteName(QString remoteName)
 {
-    QByteArray ascii = aPurpose.toLocal8Bit();
-    AB_Transaction_AddPurpose(abTransaction, ascii.constData(), 0);
+    m_p->m_remoteName = remoteName;
 }
 
-void Transaction::setTextKey(int aTextKey)
+QString Transaction::remoteBankCode() const
 {
-    AB_Transaction_SetTextKey(abTransaction, aTextKey);
+    return m_p->m_remoteBankCode;
 }
 
-AB_TRANSACTION *Transaction::getAbTransaction() const
+void Transaction::setRemoteBankCode(QString remoteBankCode)
 {
-    return abTransaction;
+    m_p->m_remoteBankCode = remoteBankCode;
 }
 
-void Transaction::setter(void (*setFunction)(AB_TRANSACTION *, const char *), const QString &aString)
+QString Transaction::remoteAccountNumber() const
 {
-    QByteArray ascii = aString.toLocal8Bit();
-    setFunction(abTransaction, ascii.constData());
+    return m_p->m_remoteBankAccountNumber;
+}
+
+void Transaction::setRemoteAccountNumber(QString remoteAccountNumber)
+{
+    m_p->m_remoteBankAccountNumber = remoteAccountNumber;
+}
+
+double Transaction::value() const
+{
+    return m_p->m_value;
+}
+
+void Transaction::setValue(double value)
+{
+    m_p->m_value = value;
+}
+
+QString Transaction::purpose() const
+{
+    return m_p->m_purpose;
+}
+
+void Transaction::setPurpose(QString purpose)
+{
+    m_p->m_purpose = purpose;
+}
+
+int Transaction::textKey() const
+{
+    return m_p->m_textKey;
+}
+
+void Transaction::setTextKey(int textKey)
+{
+    m_p->m_textKey = textKey;
 }
 
 }
 }
+
+#include "dtaus/moc_transaction.cpp"
