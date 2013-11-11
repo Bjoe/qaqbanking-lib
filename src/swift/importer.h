@@ -1,10 +1,10 @@
 #ifndef QIABANKING_SWIFT_IMPORTER_H
 #define QIABANKING_SWIFT_IMPORTER_H
 
+#include <memory>
+
 #include <QString>
 #include <QList>
-
-#include <aqbanking/imexporter.h>
 
 #include "swift/transaction.h"
 
@@ -14,15 +14,14 @@ namespace swift {
 class Importer
 {
 public:
-    Importer(const QString aBankCode, const QString anAccountNumber);
+    Importer(const QString bankCode, const QString accountNumber);
     ~Importer();
 
     QList<Transaction *> importMt940Swift(const QString aFilename);
 
 private:
-    AB_IMEXPORTER_CONTEXT *imExporterContext;
-    QString bankCode;
-    QString accountNumber;
+    struct ImporterImpl;
+    std::unique_ptr<ImporterImpl> m_p;
 };
 
 } // namespace swift

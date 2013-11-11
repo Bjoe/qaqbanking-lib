@@ -36,6 +36,11 @@ void SwiftImporterTest::testReadSwift()
     QCOMPARE(transaction->getTransactionText(), QString("DAUERAUFTRAG"));
     QCOMPARE(transaction->getTransactionCode(), 8);
     QCOMPARE(transaction->getPrimanota(), QString("7000"));
+
+    for(qiabanking::swift::Transaction* transaction : transactions) {
+        delete(transaction);
+    }
+    transactions.clear();
 }
 
 }

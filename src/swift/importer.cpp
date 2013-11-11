@@ -4,6 +4,7 @@
 
 #include <time.h>
 
+#include <aqbanking/imexporter.h>
 #include <aqbanking/transaction.h>
 #include <gwenhywfar/gwentime.h>
 #include <gwenhywfar/stringlist.h>
@@ -32,15 +33,24 @@ static QDate convertToDate(const GWEN_TIME* date) {
     return QDate(time.tm_year + 1900, time.tm_mon + 1, time.tm_mday);
 }
 
-Importer::Importer(const QString aBankCode, const QString anAccountNumber)
-    : imExporterContext(0), bankCode(aBankCode), accountNumber(anAccountNumber)
+struct Importer::ImporterImpl
 {
-    imExporterContext = AB_ImExporterContext_new();
+    AB_IMEXPORTER_CONTEXT *m_imExporterContext;
+    QString m_bankCode;
+    QString m_accountNumber;
+};
+
+Importer::Importer(const QString bankCode, const QString accountNumber)
+    : m_p(new ImporterImpl)
+{
+    m_p->m_imExporterContext = AB_ImExporterContext_new();
+    m_p->m_bankCode = bankCode;
+    m_p->m_accountNumber = accountNumber;
 }
 
 Importer::~Importer()
 {
-    AB_ImExporterContext_free(imExporterContext);
+    AB_ImExporterContext_free(m_p->m_imExporterContext);
 }
 
 QList<Transaction *> Importer::importMt940Swift(const QString aFilename)
@@ -55,7 +65,7 @@ QList<Transaction *> Importer::importMt940Swift(const QString aFilename)
     }
 
     const QByteArray ascii = aFilename.toLocal8Bit();
-    result = AB_Banking_ImportFileWithProfile(abBanking, "swift", imExporterContext, "SWIFT-MT940", 0, ascii.constData());
+    result = AB_Banking_ImportFileWithProfile(abBanking, "swift", m_p->m_imExporterContext, "SWIFT-MT940", 0, ascii.constData());
     if(result != 0) {
         return transactionList;
         //qDebug() << "Export Error " << result;
@@ -64,10 +74,10 @@ QList<Transaction *> Importer::importMt940Swift(const QString aFilename)
                 std::cout << "Export Log " << *log << std::endl;
     } */
 
-    const QByteArray bankCodeAscii = bankCode.toLocal8Bit();
-    const QByteArray accountNumberAscii = accountNumber.toLocal8Bit();
+    const QByteArray bankCodeAscii = m_p->m_bankCode.toLocal8Bit();
+    const QByteArray accountNumberAscii = m_p->m_accountNumber.toLocal8Bit();
     AB_IMEXPORTER_ACCOUNTINFO *accountInfo = AB_ImExporterContext_FindAccountInfo(
-                imExporterContext, bankCodeAscii.constData(), accountNumberAscii.constData());
+                m_p->m_imExporterContext, bankCodeAscii.constData(), accountNumberAscii.constData());
 
     if(accountInfo != 0) {
         AB_TRANSACTION *abTransaction = AB_ImExporterAccountInfo_GetFirstTransaction(accountInfo);
@@ -89,6 +99,7 @@ QList<Transaction *> Importer::importMt940Swift(const QString aFilename)
             AB_Transaction_free(abTransaction);
             abTransaction = AB_ImExporterAccountInfo_GetNextTransaction(accountInfo);
         }
+        AB_ImExporterAccountInfo_free(accountInfo);
     } else {
         // TODO Meldung: Keine Daten fuer Konto accountNumber bankCode gefunden
     }
