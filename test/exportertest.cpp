@@ -24,7 +24,7 @@ private slots:
 
 void ExporterTest::testCreateExporter()
 {
-    qiabanking::dtaus::Exporter exporter = qiabanking::dtaus::ExportBuilder()
+    QSharedPointer<qiabanking::dtaus::Exporter> exporter = qiabanking::dtaus::ExportBuilder()
             .withBankName("Sparstrumpf")
             .withBankCode("30050110")
             .withCurrency("EUR")
@@ -38,9 +38,9 @@ void ExporterTest::testCreateExporter()
     transaction->setRemoteBankCode("40050220");
     transaction->setRemoteAccountNumber("4321");
     transaction->setValue(15);
-    exporter.addTransaction(transaction);
+    exporter->addTransaction(transaction);
 
-    exporter.createDtausFile("DTAUS0.txt");
+    exporter->createDtausFile("DTAUS0.txt");
 
     QDate date = QDate::currentDate();
 
@@ -56,6 +56,7 @@ void ExporterTest::testCreateExporter()
                            "DORF E.V.                                             1  00                                        "
                            "                             0128E     0000001000000000000000000000000004321000000000400502200000000001500"
                            "                                                   ").arg(date.toString("ddMMyy")));
+
 }
 
 }

@@ -2,6 +2,7 @@
 #define EXPORTBUILDER_H
 
 #include <QString>
+#include <QSharedPointer>
 
 #include "exporter.h"
 
@@ -38,9 +39,9 @@ public:
         return *this;
     }
 
-    Exporter build() const
+    QSharedPointer<Exporter> build() const
     {
-        Exporter exporter(accountNumber, bankName, bankCode, currency);
+        QSharedPointer<Exporter> exporter = QSharedPointer<Exporter>(new Exporter(accountNumber, bankName, bankCode, currency));
         return exporter;
     }
 

@@ -1,27 +1,31 @@
 #ifndef EXPORTER_H
 #define EXPORTER_H
 
+#include <memory>
+
+#include <QObject>
 #include <QString>
 #include <QSharedPointer>
-
-#include <aqbanking/imexporter.h>
 
 #include "transaction.h"
 
 namespace qiabanking {
 namespace dtaus {
 
-class Exporter
+class Exporter : public QObject
 {
+    Q_OBJECT
+
 public:
     Exporter(const QString &anAccountNumber, const QString &aBankName, const QString &aBankCode, const QString &aCurrency);
-    ~Exporter();
+    virtual ~Exporter();
 
     void addTransaction(const QSharedPointer<Transaction> transaction);
     void createDtausFile(const QString &aFilename);
 
 private:
-    AB_IMEXPORTER_CONTEXT *imExporterContext;
+    struct ExporterImpl;
+    std::unique_ptr<ExporterImpl> m_p;
 };
 
 }

@@ -3,6 +3,8 @@
 #include <functional>
 
 #include <QByteArray>
+
+#include <aqbanking/imexporter.h>
 #include <aqbanking/banking.h>
 #include <aqbanking/transaction.h>
 #include <aqbanking/value.h>
@@ -17,10 +19,20 @@ static void convertToChar(const QString &string, std::function<void(const char*)
     setChar(data);
 }
 
-Exporter::Exporter(const QString &anAccountNumber, const QString &aBankName, const QString &aBankCode, const QString &aCurrency) :
-    imExporterContext(AB_ImExporterContext_new())
+struct Exporter::ExporterImpl
 {
-    AB_IMEXPORTER_ACCOUNTINFO *accountInfo = AB_ImExporterAccountInfo_new();
+      AB_IMEXPORTER_ACCOUNTINFO* m_accountInfo;
+      AB_IMEXPORTER_CONTEXT* m_exporterContext;
+};
+
+Exporter::Exporter(const QString &anAccountNumber, const QString &aBankName, const QString &aBankCode, const QString &aCurrency) :
+    m_p(new ExporterImpl)
+{
+    m_p->m_exporterContext = AB_ImExporterContext_new();
+    m_p->m_accountInfo = AB_ImExporterAccountInfo_new();
+
+    AB_IMEXPORTER_ACCOUNTINFO* accountInfo = m_p->m_accountInfo;
+
     convertToChar(anAccountNumber,
                   [accountInfo](const char* data) { AB_ImExporterAccountInfo_SetAccountNumber(accountInfo, data); });
 
@@ -32,13 +44,12 @@ Exporter::Exporter(const QString &anAccountNumber, const QString &aBankName, con
 
     convertToChar(aCurrency,
                   [accountInfo](const char* data) { AB_ImExporterAccountInfo_SetCurrency(accountInfo, data); });
-
-    AB_ImExporterContext_AddAccountInfo(imExporterContext, accountInfo);
 }
 
 Exporter::~Exporter()
 {
-    AB_ImExporterContext_free(imExporterContext);
+    AB_ImExporterAccountInfo_free(m_p->m_accountInfo);
+    AB_ImExporterContext_free(m_p->m_exporterContext);
 }
 
 void Exporter::addTransaction(const QSharedPointer<Transaction> transaction)
@@ -71,7 +82,7 @@ void Exporter::addTransaction(const QSharedPointer<Transaction> transaction)
     AB_Value_free(value);
     AB_Transaction_SetTextKey(abTransaction, transaction->textKey());
 
-    AB_ImExporterContext_AddTransaction(imExporterContext, abTransaction);
+    AB_ImExporterAccountInfo_AddTransaction(m_p->m_accountInfo, abTransaction);
 }
 
 void Exporter::createDtausFile(const QString &aFilename)
@@ -84,7 +95,8 @@ void Exporter::createDtausFile(const QString &aFilename)
     }
 
     const QByteArray ascii = aFilename.toLocal8Bit();
-    result = AB_Banking_ExportToFile(abBanking, imExporterContext, "dtaus", "debitnote", ascii.constData());
+    AB_ImExporterContext_AddAccountInfo(m_p->m_exporterContext, m_p->m_accountInfo);
+    result = AB_Banking_ExportToFile(abBanking, m_p->m_exporterContext, "dtaus", "debitnote", ascii.constData());
     if(result != 0) {
  //       std::cerr << "Export Error " << result << std::endl;
     } /*else {
