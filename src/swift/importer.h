@@ -20,7 +20,7 @@ public:
     QList<Transaction *> importMt940Swift(const QString aFilename);
 
 private:
-    struct ImporterImpl;
+    class ImporterImpl;
     std::unique_ptr<ImporterImpl> m_p;
 };
 

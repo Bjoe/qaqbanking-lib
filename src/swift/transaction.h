@@ -42,7 +42,7 @@ public:
     QString getPrimanota() const;
 
 private:
-    struct TransactionImpl;
+    class TransactionImpl;
     std::unique_ptr<TransactionImpl> m_p;
 };
 

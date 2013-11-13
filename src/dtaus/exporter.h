@@ -24,7 +24,7 @@ public:
     void createDtausFile(const QString &aFilename);
 
 private:
-    struct ExporterImpl;
+    class ExporterImpl;
     std::unique_ptr<ExporterImpl> m_p;
 };
 

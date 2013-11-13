@@ -37,7 +37,7 @@ public:
     void setTextKey(int textKey);
 
 private:
-    struct TransactionImpl;
+    class TransactionImpl;
     std::unique_ptr<TransactionImpl> m_p;
 };
 
