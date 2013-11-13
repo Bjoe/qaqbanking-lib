@@ -29,7 +29,7 @@ void Transaction::setRemoteName(QString remoteName)
     m_p->m_remoteName = remoteName;
 }
 
-QString Transaction::getRemoteName() const
+QString Transaction::remoteName() const
 {
     return m_p->m_remoteName;
 }
@@ -39,7 +39,7 @@ void Transaction::setRemoteBankCode(QString remoteBankCode)
     m_p->m_remoteBankCode = remoteBankCode;
 }
 
-QString Transaction::getRemoteBankCode() const
+QString Transaction::remoteBankCode() const
 {
     return m_p->m_remoteBankCode;
 }
@@ -49,7 +49,7 @@ void Transaction::setRemoteAccountNumber(QString accountNumber)
     m_p->m_remoteAccountNumber = accountNumber;
 }
 
-QString Transaction::getRemoteAccountNumber() const
+QString Transaction::remoteAccountNumber() const
 {
     return m_p->m_remoteAccountNumber;
 }
@@ -59,7 +59,7 @@ void Transaction::setValue(double value)
     m_p->m_value = value;
 }
 
-double Transaction::getValue() const
+double Transaction::value() const
 {
     return m_p->m_value;
 }
@@ -69,7 +69,7 @@ void Transaction::setValutaDate(QDate date)
     m_p->m_valuta = date;
 }
 
-QDate Transaction::getValutaDate() const
+QDate Transaction::valutaDate() const
 {
     return m_p->m_valuta;
 }
@@ -79,7 +79,7 @@ void Transaction::setDate(QDate date)
     m_p->m_date = date;
 }
 
-QDate Transaction::getDate() const
+QDate Transaction::date() const
 {
     return m_p->m_date;
 }
@@ -89,7 +89,7 @@ void Transaction::setPurpose(QString purpose)
     m_p->m_purpose = purpose;
 }
 
-QString Transaction::getPurpose() const
+QString Transaction::purpose() const
 {
     return m_p->m_purpose;
 }
@@ -99,7 +99,7 @@ void Transaction::setTransactionText(QString text)
     m_p->m_transactionText = text;
 }
 
-QString Transaction::getTransactionText() const
+QString Transaction::transactionText() const
 {
     return m_p->m_transactionText;
 }
@@ -109,7 +109,7 @@ void Transaction::setTransactionCode(int code)
     m_p->m_transactionCode = code;
 }
 
-int Transaction::getTransactionCode() const
+int Transaction::transactionCode() const
 {
     return m_p->m_transactionCode;
 }
@@ -119,7 +119,7 @@ void Transaction::setPrimanota(QString primanota)
     m_p->m_primanota = primanota;
 }
 
-QString Transaction::getPrimanota() const
+QString Transaction::primanota() const
 {
     return m_p->m_primanota;
 }

@@ -26,16 +26,16 @@ void SwiftImporterTest::testReadSwift()
     QCOMPARE(transactions.size(), 3);
 
     qaqbanking::swift::Transaction *transaction = transactions.at(0);
-    QCOMPARE(transaction->getRemoteName(), QString("HANZ MEIERSEN"));
-    QCOMPARE(transaction->getRemoteBankCode(), QString("94392193"));
-    QCOMPARE(transaction->getRemoteAccountNumber(), QString("3945824293"));
-    QCOMPARE(transaction->getValutaDate().toString(Qt::ISODate), QString("2012-10-01"));
-    QCOMPARE(transaction->getDate().toString(Qt::ISODate), QString("2012-10-01"));
-    QCOMPARE(transaction->getValue(), -199.0);
-    QCOMPARE(transaction->getPurpose(), QString("KOHLE UND LK"));
-    QCOMPARE(transaction->getTransactionText(), QString("DAUERAUFTRAG"));
-    QCOMPARE(transaction->getTransactionCode(), 8);
-    QCOMPARE(transaction->getPrimanota(), QString("7000"));
+    QCOMPARE(transaction->remoteName(), QString("HANZ MEIERSEN"));
+    QCOMPARE(transaction->remoteBankCode(), QString("94392193"));
+    QCOMPARE(transaction->remoteAccountNumber(), QString("3945824293"));
+    QCOMPARE(transaction->valutaDate().toString(Qt::ISODate), QString("2012-10-01"));
+    QCOMPARE(transaction->date().toString(Qt::ISODate), QString("2012-10-01"));
+    QCOMPARE(transaction->value(), -199.0);
+    QCOMPARE(transaction->purpose(), QString("KOHLE UND LK"));
+    QCOMPARE(transaction->transactionText(), QString("DAUERAUFTRAG"));
+    QCOMPARE(transaction->transactionCode(), 8);
+    QCOMPARE(transaction->primanota(), QString("7000"));
 
     for(qaqbanking::swift::Transaction* transaction : transactions) {
         delete(transaction);

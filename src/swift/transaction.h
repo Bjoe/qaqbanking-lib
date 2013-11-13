@@ -19,27 +19,27 @@ public:
     virtual ~Transaction();
 
     void setRemoteName(QString remoteName);
-    QString getRemoteName() const;
+    QString remoteName() const;
     void setRemoteBankCode(QString remoteBankCode);
-    QString getRemoteBankCode() const;
+    QString remoteBankCode() const;
     void setRemoteAccountNumber(QString accountNumber);
-    QString getRemoteAccountNumber() const;
+    QString remoteAccountNumber() const;
 
     void setValue(double value);
-    double getValue() const;
+    double value() const;
     void setValutaDate(QDate date);
-    QDate getValutaDate() const;
+    QDate valutaDate() const;
     void setDate(QDate date);
-    QDate getDate() const;
+    QDate date() const;
 
     void setPurpose(QString purpose);
-    QString getPurpose() const;
+    QString purpose() const;
     void setTransactionText(QString text);
-    QString getTransactionText() const;
+    QString transactionText() const;
     void setTransactionCode(int code);
-    int getTransactionCode() const;
+    int transactionCode() const;
     void setPrimanota(QString primanota);
-    QString getPrimanota() const;
+    QString primanota() const;
 
 private:
     class TransactionImpl;
