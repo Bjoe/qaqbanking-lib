@@ -6,10 +6,10 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" CACHE PATH "cmake modul path")
 include(BuildUtil)
 
 # The version number.
-set (QIABanking_VERSION_MAJOR 0)
-set (QIABanking_VERSION_MINOR 2)
-set (QIABanking_VERSION_PATCH 0)
-set (QIABanking_VERSION ${QIABanking_VERSION_MAJOR}.${QIABanking_VERSION_MINOR}.${QIABanking_VERSION_PATCH})
+set (QAqBanking_VERSION_MAJOR 0)
+set (QAqBanking_VERSION_MINOR 2)
+set (QAqBanking_VERSION_PATCH 0)
+set (QAqBanking_VERSION ${QAqBanking_VERSION_MAJOR}.${QAqBanking_VERSION_MINOR}.${QAqBanking_VERSION_PATCH})
 
 add_definitions(-std=c++11)
 
@@ -20,7 +20,7 @@ set(INSTALL_INCLUDE_DIR include CACHE PATH "Installation directory for header fi
 if(WIN32 AND NOT CYGWIN)
   set(DEF_INSTALL_CMAKE_DIR CMake)
 else()
-  set(DEF_INSTALL_CMAKE_DIR lib/CMake/QIABanking)
+  set(DEF_INSTALL_CMAKE_DIR lib/CMake/QAqBanking)
 endif()
 set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
 
@@ -59,36 +59,36 @@ if(${TEST})
 endif(${TEST})
 
 # Add all targets to the build-tree export set
-export(TARGETS qiabanking
-  FILE "${PROJECT_BINARY_DIR}/QIABankingTargets.cmake")
+export(TARGETS qaqbanking
+  FILE "${PROJECT_BINARY_DIR}/QAqBankingTargets.cmake")
 
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
-export(PACKAGE QIABanking)
+export(PACKAGE QAqBanking)
 
-# Create the QIABankingConfig.cmake and QIABankingConfigVersion.cmake files
+# Create the QAqBankingConfig.cmake and QAqBankingConfigVersion.cmake files
 # ... for the build tree
 set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src" "${PROJECT_BINARY_DIR}")
-configure_file(QIABankingConfig.cmake.in
-  "${PROJECT_BINARY_DIR}/QIABankingConfig.cmake" @ONLY)
+configure_file(QAqBankingConfig.cmake.in
+  "${PROJECT_BINARY_DIR}/QAqBankingConfig.cmake" @ONLY)
 
 # ... for the install tree
 file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
    "${INSTALL_INCLUDE_DIR}")
 set(CONF_INCLUDE_DIRS "\${QPJSIP_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-configure_file(QIABankingConfig.cmake.in
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/QIABankingConfig.cmake" @ONLY)
+configure_file(QAqBankingConfig.cmake.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/QAqBankingConfig.cmake" @ONLY)
 
 # ... for both
-configure_file(QIABankingConfigVersion.cmake.in
-  "${PROJECT_BINARY_DIR}/QIABankingConfigVersion.cmake" @ONLY)
+configure_file(QAqBankingConfigVersion.cmake.in
+  "${PROJECT_BINARY_DIR}/QAqBankingConfigVersion.cmake" @ONLY)
  
-# Install the QIABankingConfig.cmake and QIABankingConfigVersion.cmake
+# Install the QAqBankingConfig.cmake and QAqBankingConfigVersion.cmake
 install(FILES
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/QIABankingConfig.cmake"
-  "${PROJECT_BINARY_DIR}/QIABankingConfigVersion.cmake"
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/QAqBankingConfig.cmake"
+  "${PROJECT_BINARY_DIR}/QAqBankingConfigVersion.cmake"
   DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
  
 # Install the export set for use with the install-tree
-install(EXPORT QIABankingTargets DESTINATION
+install(EXPORT QAqBankingTargets DESTINATION
   "${INSTALL_CMAKE_DIR}" COMPONENT dev)

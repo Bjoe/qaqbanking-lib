@@ -21,14 +21,14 @@ set(QT_SRCS
 )
 
 
-add_library(qiabanking STATIC ${QT_SRCS} ${MOC_OUTFILES})
-target_link_libraries(qiabanking Qt5::Core)
+add_library(qaqbanking STATIC ${QT_SRCS} ${MOC_OUTFILES})
+target_link_libraries(qaqbanking Qt5::Core)
 
-set_target_properties(qiabanking PROPERTIES
+set_target_properties(qaqbanking PROPERTIES
   PUBLIC_HEADER "${HEADERS}")
  
-install(TARGETS qiabanking
-  # IMPORTANT: Add the qiabanking library to the "export-set"
-  EXPORT QIABankingTargets
+install(TARGETS qaqbanking
+  # IMPORTANT: Add the qaqbanking library to the "export-set"
+  EXPORT QAqBankingTargets
   ARCHIVE DESTINATION "${INSTALL_LIB_DIR}" COMPONENT dev
   PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}" COMPONENT dev)

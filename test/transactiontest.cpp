@@ -1,5 +1,4 @@
 #include <QtTest/QtTest>
-#include "testcoverageobject.h"
 
 #include <QSharedPointer>
 
@@ -12,7 +11,7 @@
 namespace test
 {
 
-class TransactionTest : public qttestutil::TestCoverageObject
+class TransactionTest : public QObject
 {
     Q_OBJECT
 

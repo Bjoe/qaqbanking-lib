@@ -1,10 +1,5 @@
 
-if(CMAKE_CROSSCOMPILING)
-    include(Coverage)
-endif(CMAKE_CROSSCOMPILING)
-
 pkg_check_modules(GWEN REQUIRED gwenhywfar)
-find_package(QtTestUtil)
 
 set(CMAKE_AUTOMOC OFF)
 
@@ -23,15 +18,13 @@ configure_file (
 include_directories(
     ../src
     ${CMAKE_CURRENT_BINARY_DIR}/../src
-    ${QT_TEST_UTIL_INCLUDE_DIRS}
     ${GWEN_INCLUDE_DIRS}
 )
 
 set(test_additional_lib
-    qiabanking
+    qaqbanking
     ${AQB_LIBRARIES}
     ${GWEN_LIBRARIES}
-    ${QT_TEST_UTIL_LIBRARIES}
 )
 
 qt_test(accountinfo accountinfotest.cpp)

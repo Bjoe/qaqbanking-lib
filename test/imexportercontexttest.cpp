@@ -1,5 +1,4 @@
 #include <QtTest/QtTest>
-#include "testcoverageobject.h"
 
 #include "imexportercontext.h"
 
@@ -9,7 +8,7 @@
 namespace test
 {
 
-class ImExporterContextTest : public qttestutil::TestCoverageObject
+class ImExporterContextTest : public QObject
 {
     Q_OBJECT
 

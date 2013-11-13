@@ -4,8 +4,6 @@
 #include <QTextStream>
 #include <QSharedPointer>
 
-#include "testcoverageobject.h"
-
 #include "dtaus/exporter.h"
 #include "dtaus/exportbuilder.h"
 
@@ -14,7 +12,7 @@
 namespace test
 {
 
-class ExporterTest : public qttestutil::TestCoverageObject
+class ExporterTest : public QObject
 {
     Q_OBJECT
 

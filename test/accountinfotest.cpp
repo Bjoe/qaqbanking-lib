@@ -2,14 +2,13 @@
 
 #include <aqbanking/imexporter.h>
 
-#include "testcoverageobject.h"
 #include "accountinfo.h"
 #include "accountinfobuilder.h"
 
 namespace test
 {
 
-class AccountInfoTest : public qttestutil::TestCoverageObject
+class AccountInfoTest : public QObject
 {
     Q_OBJECT
 
