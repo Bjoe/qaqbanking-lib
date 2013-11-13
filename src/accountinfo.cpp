@@ -2,7 +2,7 @@
 
 #include <QByteArray>
 
-namespace qiabanking
+namespace qaqbanking
 {
 
 AccountInfo::AccountInfo() : abAccountInfo(0)

@@ -5,7 +5,7 @@
 
 #include "accountinfo.h"
 
-namespace qiabanking
+namespace qaqbanking
 {
 
 class ImExporterContext

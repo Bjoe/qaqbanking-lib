@@ -24,14 +24,14 @@ private slots:
 
 void ExporterTest::testCreateExporter()
 {
-    QSharedPointer<qiabanking::dtaus::Exporter> exporter = qiabanking::dtaus::ExportBuilder()
+    QSharedPointer<qaqbanking::dtaus::Exporter> exporter = qaqbanking::dtaus::ExportBuilder()
             .withBankName("Sparstrumpf")
             .withBankCode("30050110")
             .withCurrency("EUR")
             .withAccountNumber("123456")
             .build();
 
-    QSharedPointer<qiabanking::dtaus::Transaction> transaction = QSharedPointer<qiabanking::dtaus::Transaction>(new qiabanking::dtaus::Transaction);
+    QSharedPointer<qaqbanking::dtaus::Transaction> transaction = QSharedPointer<qaqbanking::dtaus::Transaction>(new qaqbanking::dtaus::Transaction);
     transaction->setLocalName("Dorf e.V.");
     transaction->setLocalBankCode("30050110");
     transaction->setLocalAccountNumber("123456");

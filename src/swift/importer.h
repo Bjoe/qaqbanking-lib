@@ -8,7 +8,7 @@
 
 #include "swift/transaction.h"
 
-namespace qiabanking {
+namespace qaqbanking {
 namespace swift {
 
 class Importer
@@ -25,6 +25,6 @@ private:
 };
 
 } // namespace swift
-} // namespace qiabanking
+} // namespace qaqbanking
 
 #endif // QIABANKING_SWIFT_IMPORTER_H

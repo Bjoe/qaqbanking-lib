@@ -10,7 +10,7 @@
 #include <gwenhywfar/stringlist.h>
 #include <aqbanking/value.h>
 
-namespace qiabanking {
+namespace qaqbanking {
 namespace swift {
 
 static QString convertToString(const GWEN_STRINGLIST* stringList) {
@@ -107,4 +107,4 @@ QList<Transaction *> Importer::importMt940Swift(const QString aFilename)
 }
 
 } // namespace swift
-} // namespace qiabanking
+} // namespace qaqbanking

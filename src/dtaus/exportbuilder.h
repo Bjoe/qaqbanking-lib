@@ -6,7 +6,7 @@
 
 #include "exporter.h"
 
-namespace qiabanking {
+namespace qaqbanking {
 namespace dtaus {
 
 class ExportBuilder

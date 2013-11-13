@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QString>
 
-namespace qiabanking {
+namespace qaqbanking {
 namespace dtaus {
 
 class Transaction : public QObject

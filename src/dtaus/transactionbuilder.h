@@ -9,7 +9,7 @@
 
 #include "transaction.h"
 
-namespace qiabanking {
+namespace qaqbanking {
 namespace dtaus {
 
 class TransactionBuilder

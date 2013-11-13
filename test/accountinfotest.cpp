@@ -19,7 +19,7 @@ private slots:
 
 void AccountInfoTest::testCreateAccountInfo()
 {
-    qiabanking::AccountInfo accountInfo = qiabanking::AccountInfoBuilder()
+    qaqbanking::AccountInfo accountInfo = qaqbanking::AccountInfoBuilder()
             .withBankName("Sparstrumpf")
             .withBankCode("30050110")
             .withCurrency("EUR")

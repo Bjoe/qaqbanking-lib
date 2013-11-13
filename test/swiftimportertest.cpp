@@ -20,12 +20,12 @@ private slots:
 
 void SwiftImporterTest::testReadSwift()
 {
-    qiabanking::swift::Importer importer("29485723", "0932104953");
-    QList<qiabanking::swift::Transaction *> transactions = importer.importMt940Swift(MT940TESTFILE);
+    qaqbanking::swift::Importer importer("29485723", "0932104953");
+    QList<qaqbanking::swift::Transaction *> transactions = importer.importMt940Swift(MT940TESTFILE);
 
     QCOMPARE(transactions.size(), 3);
 
-    qiabanking::swift::Transaction *transaction = transactions.at(0);
+    qaqbanking::swift::Transaction *transaction = transactions.at(0);
     QCOMPARE(transaction->getRemoteName(), QString("HANZ MEIERSEN"));
     QCOMPARE(transaction->getRemoteBankCode(), QString("94392193"));
     QCOMPARE(transaction->getRemoteAccountNumber(), QString("3945824293"));
@@ -37,7 +37,7 @@ void SwiftImporterTest::testReadSwift()
     QCOMPARE(transaction->getTransactionCode(), 8);
     QCOMPARE(transaction->getPrimanota(), QString("7000"));
 
-    for(qiabanking::swift::Transaction* transaction : transactions) {
+    for(qaqbanking::swift::Transaction* transaction : transactions) {
         delete(transaction);
     }
     transactions.clear();

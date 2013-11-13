@@ -21,13 +21,13 @@ private slots:
 
 void ImExporterContextTest::testCreateImExporter()
 {
-    qiabanking::AccountInfo accountInfo;
+    qaqbanking::AccountInfo accountInfo;
     accountInfo.setBankName("foobar");
 
-    qiabanking::ImExporterContext imExporterContext;
+    qaqbanking::ImExporterContext imExporterContext;
     imExporterContext.addAccountInfo(accountInfo);
 
-    qiabanking::AccountInfo accountInfo2 = imExporterContext.getNextAccountInfo();
+    qaqbanking::AccountInfo accountInfo2 = imExporterContext.getNextAccountInfo();
 
     QCOMPARE(AB_ImExporterAccountInfo_GetBankName(accountInfo2.getAbAccountInfo()),
              "foobar");
@@ -35,29 +35,29 @@ void ImExporterContextTest::testCreateImExporter()
 
 void ImExporterContextTest::testTwoAccountInfos()
 {
-    qiabanking::AccountInfo accountInfo;
+    qaqbanking::AccountInfo accountInfo;
     accountInfo.setBankName("foobar");
 
-    qiabanking::AccountInfo accountInfo2;
+    qaqbanking::AccountInfo accountInfo2;
     accountInfo2.setBankName("barfoo");
 
-    qiabanking::ImExporterContext imExporterContext;
+    qaqbanking::ImExporterContext imExporterContext;
     imExporterContext.addAccountInfo(accountInfo);
     imExporterContext.addAccountInfo(accountInfo2);
 
-    qiabanking::AccountInfo accountInfo3 = imExporterContext.getNextAccountInfo();
+    qaqbanking::AccountInfo accountInfo3 = imExporterContext.getNextAccountInfo();
     QCOMPARE(AB_ImExporterAccountInfo_GetBankName(accountInfo3.getAbAccountInfo()),
              "foobar");
 
-    qiabanking::AccountInfo accountInfo4 = imExporterContext.getNextAccountInfo();
+    qaqbanking::AccountInfo accountInfo4 = imExporterContext.getNextAccountInfo();
     QCOMPARE(AB_ImExporterAccountInfo_GetBankName(accountInfo4.getAbAccountInfo()),
              "barfoo");
 }
 
 void ImExporterContextTest::testInvalid()
 {
-    qiabanking::ImExporterContext imExporterContext;
-    qiabanking::AccountInfo invalid = imExporterContext.getNextAccountInfo();
+    qaqbanking::ImExporterContext imExporterContext;
+    qaqbanking::AccountInfo invalid = imExporterContext.getNextAccountInfo();
 
     QVERIFY(invalid.isValid() == false);
 }

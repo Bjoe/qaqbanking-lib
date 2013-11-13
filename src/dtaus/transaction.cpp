@@ -1,6 +1,6 @@
 #include "transaction.h"
 
-namespace qiabanking {
+namespace qaqbanking {
 namespace dtaus {
 
 struct Transaction::TransactionImpl {

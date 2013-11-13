@@ -7,7 +7,7 @@
 #include <QString>
 #include <QDate>
 
-namespace qiabanking {
+namespace qaqbanking {
 namespace swift {
 
 class Transaction : public QObject
@@ -47,6 +47,6 @@ private:
 };
 
 } // namespace swift
-} // namespace qiabanking
+} // namespace qaqbanking
 
 #endif // QIABANKING_SWIFT_TRANSACTION_H

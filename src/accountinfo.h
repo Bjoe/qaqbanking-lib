@@ -6,7 +6,7 @@
 
 #include "dtaus/transaction.h"
 
-namespace qiabanking
+namespace qaqbanking
 {
 
 class AccountInfo

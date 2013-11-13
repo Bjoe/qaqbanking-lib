@@ -9,7 +9,7 @@
 #include <aqbanking/transaction.h>
 #include <aqbanking/value.h>
 
-namespace qiabanking {
+namespace qaqbanking {
 namespace dtaus {
 
 static void convertToChar(const QString &string, std::function<void(const char*)> setChar)

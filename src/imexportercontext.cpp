@@ -1,6 +1,6 @@
 #include "imexportercontext.h"
 
-namespace qiabanking
+namespace qaqbanking
 {
 
 ImExporterContext::ImExporterContext() :

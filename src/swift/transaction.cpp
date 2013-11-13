@@ -1,6 +1,6 @@
 #include "transaction.h"
 
-namespace qiabanking {
+namespace qaqbanking {
 namespace swift {
 
 struct Transaction::TransactionImpl {
@@ -125,6 +125,6 @@ QString Transaction::getPrimanota() const
 }
 
 } // namespace swift
-} // namespace qiabanking
+} // namespace qaqbanking
 
 #include "swift/moc_transaction.cpp"

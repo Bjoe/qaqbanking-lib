@@ -23,8 +23,8 @@ private slots:
 
 void TransactionTest::testDtausTransaction()
 {
-    QSharedPointer<qiabanking::dtaus::Transaction> transaction =
-            qiabanking::dtaus::TransactionBuilder()
+    QSharedPointer<qaqbanking::dtaus::Transaction> transaction =
+            qaqbanking::dtaus::TransactionBuilder()
             .withLocalName("Foo")
             .withLocalBankCode("123456")
             .withLocalAccountNumber("654321")
