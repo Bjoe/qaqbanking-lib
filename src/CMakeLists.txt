@@ -1,8 +1,5 @@
 
 set(HEADERS
-  accountinfobuilder.h
-  accountinfo.h
-  imexportercontext.h
   dtaus/exporter.h
   dtaus/exportbuilder.h
   dtaus/transactionbuilder.h
@@ -12,8 +9,6 @@ set(HEADERS
 )
 
 set(QT_SRCS
-    accountinfo.cpp
-    imexportercontext.cpp
     dtaus/transaction.cpp
     dtaus/exporter.cpp
     swift/importer.cpp

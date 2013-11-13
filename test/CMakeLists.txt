@@ -27,9 +27,7 @@ set(test_additional_lib
     ${GWEN_LIBRARIES}
 )
 
-qt_test(accountinfo accountinfotest.cpp)
 qt_test(transaction transactiontest.cpp)
-qt_test(imexportercontext imexportercontexttest.cpp)
 qt_test(exporter exportertest.cpp)
 qt_test(swiftimporter swiftimportertest.cpp)
 qt_test(mainswift mainswifttest.cpp)
