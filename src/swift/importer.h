@@ -3,21 +3,33 @@
 
 #include <memory>
 
+#include <QObject>
 #include <QString>
 #include <QList>
+#include <QTextStream>
+#include <QPointer>
 
+#include "state.h"
 #include "swift/transaction.h"
 
 namespace qaqbanking {
 namespace swift {
 
-class Importer
+class Importer : public QObject
 {
+    Q_OBJECT
+
 public:
     Importer(const QString bankCode, const QString accountNumber);
     ~Importer();
 
-    QList<Transaction *> importMt940Swift(const QString aFilename);
+    QList<QSharedPointer<Transaction> > importMt940Swift(const QString filename);
+    QList<QSharedPointer<Transaction> > importMt940Swift(QTextStream *stream);
+
+    State lastState() const;
+
+signals:
+    void logMessage(QString message);
 
 private:
     class ImporterImpl;

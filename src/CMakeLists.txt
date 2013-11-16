@@ -1,5 +1,6 @@
 
 set(HEADERS
+  state.h
   dtaus/exporter.h
   dtaus/exportbuilder.h
   dtaus/transactionbuilder.h
@@ -9,6 +10,7 @@ set(HEADERS
 )
 
 set(QT_SRCS
+    state.cpp
     dtaus/transaction.cpp
     dtaus/exporter.cpp
     swift/importer.cpp

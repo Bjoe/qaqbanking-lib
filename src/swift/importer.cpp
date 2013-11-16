@@ -2,13 +2,17 @@
 
 #include <QByteArray>
 
+#include <functional>
 #include <time.h>
 
 #include <aqbanking/imexporter.h>
 #include <aqbanking/transaction.h>
 #include <gwenhywfar/gwentime.h>
 #include <gwenhywfar/stringlist.h>
+#include <gwenhywfar/buffer.h>
 #include <aqbanking/value.h>
+
+#include <QDebug>
 
 namespace qaqbanking {
 namespace swift {
@@ -33,77 +37,148 @@ static QDate convertToDate(const GWEN_TIME* date) {
     return QDate(time.tm_year + 1900, time.tm_mon + 1, time.tm_mday);
 }
 
-struct Importer::ImporterImpl
+class Importer::ImporterImpl
 {
+public:
+    ImporterImpl(const QString bankCode, const QString accountNumber)
+        : m_imExporterContext(AB_ImExporterContext_new()),
+          m_bankCode(bankCode),
+          m_accountNumber(accountNumber),
+          m_state()
+    {}
+
+    ~ImporterImpl()
+    {
+        AB_ImExporterContext_free(m_imExporterContext);
+    }
+
+    QList<QSharedPointer<Transaction> > importMt940Swift(std::function<int(AB_BANKING*, AB_IMEXPORTER_CONTEXT*)> import,
+                                                         std::function<void(QString)> log,
+                                                         std::function<void()> cleanUp = [](){})
+    {
+        QList<QSharedPointer<Transaction> > transactionList;
+
+        AB_BANKING *abBanking = AB_Banking_new("QAqBanking", 0, 0);
+        int result = AB_Banking_Init(abBanking);
+        if(result != 0) {
+            m_state = State(tr("AqBankining Initialisierung Fehler"), result);
+            log(m_state.message());
+            return transactionList;
+        }
+
+        result = import(abBanking, m_imExporterContext);
+        if(result != 0) {
+            m_state = State(tr("Import error"), result);
+            log(m_state.message());
+            cleanUp();
+            AB_Banking_free(abBanking);
+            return transactionList;
+        } else {
+            QString message(AB_ImExporterContext_GetLog(m_imExporterContext));
+            log(message);
+        }
+
+        const QByteArray bankCodeAscii = m_bankCode.toLocal8Bit();
+        const QByteArray accountNumberAscii = m_accountNumber.toLocal8Bit();
+        AB_IMEXPORTER_ACCOUNTINFO *accountInfo = AB_ImExporterContext_FindAccountInfo(
+                    m_imExporterContext, bankCodeAscii.constData(), accountNumberAscii.constData());
+
+        if(accountInfo != 0) {
+            AB_TRANSACTION *abTransaction = AB_ImExporterAccountInfo_GetFirstTransaction(accountInfo);
+            while(abTransaction != 0) {
+                QSharedPointer<Transaction> transaction = QSharedPointer<Transaction>(new Transaction());
+                transaction->setRemoteName(convertToString(AB_Transaction_GetRemoteName(abTransaction)));
+                transaction->setRemoteBankCode(QString(AB_Transaction_GetRemoteBankCode(abTransaction)));
+                transaction->setRemoteAccountNumber(QString(AB_Transaction_GetRemoteAccountNumber(abTransaction)));
+                transaction->setValue(convertToDouble(AB_Transaction_GetValue(abTransaction)));
+                transaction->setValutaDate(convertToDate(AB_Transaction_GetValutaDate(abTransaction)));
+                transaction->setDate(convertToDate(AB_Transaction_GetDate(abTransaction)));
+                transaction->setPurpose(convertToString(AB_Transaction_GetPurpose(abTransaction)));
+                transaction->setTransactionText(QString(AB_Transaction_GetTransactionText(abTransaction)));
+                transaction->setTransactionCode(AB_Transaction_GetTransactionCode(abTransaction));
+                transaction->setPrimanota(QString(AB_Transaction_GetPrimanota(abTransaction)));
+
+                transactionList.append(transaction);
+
+                AB_Transaction_free(abTransaction);
+                abTransaction = AB_ImExporterAccountInfo_GetNextTransaction(accountInfo);
+            }
+            AB_ImExporterAccountInfo_free(accountInfo);
+        } else {
+            log("Es wurden keine Daten gefunden");
+        }
+        cleanUp();
+        AB_Banking_free(abBanking);
+        return transactionList;
+    }
+
+    State state() const
+    {
+        return m_state;
+    }
+
+
+private:
     AB_IMEXPORTER_CONTEXT *m_imExporterContext;
     QString m_bankCode;
     QString m_accountNumber;
+    State m_state;
 };
 
 Importer::Importer(const QString bankCode, const QString accountNumber)
-    : m_p(new ImporterImpl)
-{
-    m_p->m_imExporterContext = AB_ImExporterContext_new();
-    m_p->m_bankCode = bankCode;
-    m_p->m_accountNumber = accountNumber;
-}
+    : m_p(new ImporterImpl(bankCode, accountNumber))
+{}
 
 Importer::~Importer()
+{}
+
+QList<QSharedPointer<Transaction> > Importer::importMt940Swift(const QString filename)
 {
-    AB_ImExporterContext_free(m_p->m_imExporterContext);
+    const QByteArray ascii = filename.toLocal8Bit();
+
+    QList<QSharedPointer<Transaction> > transactionList = m_p->importMt940Swift(
+
+        [ascii] (AB_BANKING* abBanking, AB_IMEXPORTER_CONTEXT* imExporterContext) -> int
+        {
+            return AB_Banking_ImportFileWithProfile(abBanking, "swift", imExporterContext, "SWIFT-MT940", 0, ascii.constData());
+        },
+
+        [] (QString message)
+        {
+            //logMessage(message);
+        });
+
+    return transactionList;
 }
 
-QList<Transaction *> Importer::importMt940Swift(const QString aFilename)
+QList<QSharedPointer<Transaction> > Importer::importMt940Swift(QTextStream *stream)
 {
-    QList<Transaction *> transactionList;
+    QByteArray buffer;
+    buffer.append(stream->readAll());
+    GWEN_BUFFER* gwBuffer = GWEN_Buffer_new(buffer.data(), buffer.size(), buffer.size(), 0);
 
-    AB_BANKING *abBanking = AB_Banking_new("Example", 0, 0);
-    int result = AB_Banking_Init(abBanking);
-    if(result != 0) {
-        //qDebug() << "Error " << result;
-        return transactionList;
-    }
+    QList<QSharedPointer<Transaction> > transactionList = m_p->importMt940Swift(
 
-    const QByteArray ascii = aFilename.toLocal8Bit();
-    result = AB_Banking_ImportFileWithProfile(abBanking, "swift", m_p->m_imExporterContext, "SWIFT-MT940", 0, ascii.constData());
-    if(result != 0) {
-        return transactionList;
-        //qDebug() << "Export Error " << result;
-    } /*else {
-                const char *log = AB_ImExporterContext_GetLog(imExportContext);
-                std::cout << "Export Log " << *log << std::endl;
-    } */
+        [gwBuffer] (AB_BANKING* abBanking, AB_IMEXPORTER_CONTEXT* imExporterContext) -> int
+        {
+            return AB_Banking_ImportBuffer(abBanking, imExporterContext, "swift", "SWIFT-MT940", gwBuffer);
+        },
 
-    const QByteArray bankCodeAscii = m_p->m_bankCode.toLocal8Bit();
-    const QByteArray accountNumberAscii = m_p->m_accountNumber.toLocal8Bit();
-    AB_IMEXPORTER_ACCOUNTINFO *accountInfo = AB_ImExporterContext_FindAccountInfo(
-                m_p->m_imExporterContext, bankCodeAscii.constData(), accountNumberAscii.constData());
+        [] (QString message)
+        {
+            //logMessage(message);
+        },
+        [gwBuffer]()
+        {
+            GWEN_Buffer_free(gwBuffer);
+        });
 
-    if(accountInfo != 0) {
-        AB_TRANSACTION *abTransaction = AB_ImExporterAccountInfo_GetFirstTransaction(accountInfo);
-        while(abTransaction != 0) {
-            Transaction *transaction = new Transaction();
-            transaction->setRemoteName(convertToString(AB_Transaction_GetRemoteName(abTransaction)));
-            transaction->setRemoteBankCode(QString(AB_Transaction_GetRemoteBankCode(abTransaction)));
-            transaction->setRemoteAccountNumber(QString(AB_Transaction_GetRemoteAccountNumber(abTransaction)));
-            transaction->setValue(convertToDouble(AB_Transaction_GetValue(abTransaction)));
-            transaction->setValutaDate(convertToDate(AB_Transaction_GetValutaDate(abTransaction)));
-            transaction->setDate(convertToDate(AB_Transaction_GetDate(abTransaction)));
-            transaction->setPurpose(convertToString(AB_Transaction_GetPurpose(abTransaction)));
-            transaction->setTransactionText(QString(AB_Transaction_GetTransactionText(abTransaction)));
-            transaction->setTransactionCode(AB_Transaction_GetTransactionCode(abTransaction));
-            transaction->setPrimanota(QString(AB_Transaction_GetPrimanota(abTransaction)));
-
-            transactionList.append(transaction);
-
-            AB_Transaction_free(abTransaction);
-            abTransaction = AB_ImExporterAccountInfo_GetNextTransaction(accountInfo);
-        }
-        AB_ImExporterAccountInfo_free(accountInfo);
-    } else {
-        // TODO Meldung: Keine Daten fuer Konto accountNumber bankCode gefunden
-    }
     return transactionList;
+}
+
+State Importer::lastState() const
+{
+    return m_p->state();
 }
 
 } // namespace swift
