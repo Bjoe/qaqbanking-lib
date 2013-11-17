@@ -154,7 +154,9 @@ QList<TransactionPtr> Importer::importMt940Swift(const QString filename)
 
         [instance] (QString message)
         {
-            emit instance->logMessage(message);
+            if(!message.isEmpty()) {
+                emit instance->logMessage(message);
+            }
         }
     );
 
@@ -195,7 +197,9 @@ bool Importer::importMt940Swift(QTextStream *stream, std::function<void(Transact
 
         [instance] (QString message)
         {
-            emit instance->logMessage(message);
+            if(!message.isEmpty()) {
+                emit instance->logMessage(message);
+            }
         },
         [gwBuffer]()
         {

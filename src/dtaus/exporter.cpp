@@ -151,7 +151,9 @@ bool Exporter::createDtausFile(const QString &filename)
 
         [instance] (QString message)
         {
-            emit instance->logMessage(message);
+            if(!message.isEmpty()) {
+                emit instance->logMessage(message);
+            }
         }
     );
 }
@@ -171,7 +173,9 @@ bool Exporter::createDtausStream(QTextStream *stream)
 
         [instance] (QString message)
         {
-            emit instance->logMessage(message);
+            if(!message.isEmpty()) {
+                emit instance->logMessage(message);
+            }
         }
 
     );
@@ -184,7 +188,7 @@ bool Exporter::createDtausStream(QTextStream *stream)
         GWEN_Buffer_ReadBytes(gwBuffer, buffer.data(), &size);
         *stream << buffer;
     } else {
-        emit logMessage(QString("No data to export."));
+        emit logMessage(QString(tr("No data to export.")));
         result = false;
     }
     GWEN_Buffer_free(gwBuffer);
