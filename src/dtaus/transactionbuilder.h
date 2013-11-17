@@ -7,7 +7,8 @@
 
 #include <aqbanking/value.h>
 
-#include "transaction.h"
+#include "dtaus/exporter.h"
+#include "dtaus/transaction.h"
 
 namespace qaqbanking {
 namespace dtaus {
@@ -72,7 +73,7 @@ public:
         return *this;
     }
 
-    QSharedPointer<Transaction> build()
+    dtaus::TransactionPtr build()
     {
         return transaction;
     }
