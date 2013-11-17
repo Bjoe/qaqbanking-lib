@@ -16,6 +16,8 @@
 namespace qaqbanking {
 namespace swift {
 
+using TransactionPtr = QSharedPointer<Transaction>;
+
 class Importer : public QObject
 {
     Q_OBJECT
@@ -24,10 +26,10 @@ public:
     Importer(const QString bankCode, const QString accountNumber, QObject *parent = 0);
     ~Importer();
 
-    QList<QSharedPointer<Transaction> > importMt940Swift(const QString filename);
-    QList<QSharedPointer<Transaction> > importMt940Swift(QTextStream *stream);
+    QList<TransactionPtr> importMt940Swift(const QString filename);
+    QList<TransactionPtr> importMt940Swift(QTextStream *stream);
 
-    bool importMt940Swift(QTextStream *stream, std::function<void(QSharedPointer<Transaction>)> importCb);
+    bool importMt940Swift(QTextStream *stream, std::function<void(TransactionPtr)> importCb);
 
     State lastState() const;
 

@@ -103,7 +103,7 @@ Exporter::~Exporter()
 {
 }
 
-void Exporter::addTransaction(const QSharedPointer<Transaction> transaction)
+void Exporter::addTransaction(const TransactionPtr transaction)
 {
     AB_TRANSACTION *abTransaction = AB_Transaction_new();
 

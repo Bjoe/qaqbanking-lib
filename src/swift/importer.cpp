@@ -133,7 +133,7 @@ Importer::Importer(const QString bankCode, const QString accountNumber, QObject 
 Importer::~Importer()
 {}
 
-QList<QSharedPointer<Transaction> > Importer::importMt940Swift(const QString filename)
+QList<TransactionPtr> Importer::importMt940Swift(const QString filename)
 {
     const QByteArray ascii = filename.toLocal8Bit();
 
@@ -161,7 +161,7 @@ QList<QSharedPointer<Transaction> > Importer::importMt940Swift(const QString fil
     return transactionList;
 }
 
-QList<QSharedPointer<Transaction> > Importer::importMt940Swift(QTextStream *stream)
+QList<TransactionPtr> Importer::importMt940Swift(QTextStream *stream)
 {
     QList<QSharedPointer<Transaction> > transactionList;
 
@@ -176,7 +176,7 @@ QList<QSharedPointer<Transaction> > Importer::importMt940Swift(QTextStream *stre
     return transactionList;
 }
 
-bool Importer::importMt940Swift(QTextStream *stream, std::function<void (QSharedPointer<Transaction>)> importCb)
+bool Importer::importMt940Swift(QTextStream *stream, std::function<void(TransactionPtr)> importCb)
 {
     QByteArray buffer;
     buffer.append(stream->readAll());
