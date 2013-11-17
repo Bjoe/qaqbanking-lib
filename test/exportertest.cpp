@@ -18,6 +18,7 @@ class ExporterTest : public QObject
 
 private slots:
     void testCreateExporter();
+    void testCreateStreamExporter();
 };
 
 void ExporterTest::testCreateExporter()
@@ -55,6 +56,40 @@ void ExporterTest::testCreateExporter()
                            "                             0128E     0000001000000000000000000000000004321000000000400502200000000001500"
                            "                                                   ").arg(date.toString("ddMMyy")));
 
+}
+
+void ExporterTest::testCreateStreamExporter()
+{
+    QSharedPointer<qaqbanking::dtaus::Exporter> exporter = qaqbanking::dtaus::ExportBuilder()
+            .withBankName("Sparstrumpf")
+            .withBankCode("30050110")
+            .withCurrency("EUR")
+            .withAccountNumber("123456")
+            .build();
+
+    QSharedPointer<qaqbanking::dtaus::Transaction> transaction = QSharedPointer<qaqbanking::dtaus::Transaction>(new qaqbanking::dtaus::Transaction);
+    transaction->setLocalName("Dorf e.V.");
+    transaction->setLocalBankCode("30050110");
+    transaction->setLocalAccountNumber("123456");
+    transaction->setRemoteBankCode("40050220");
+    transaction->setRemoteAccountNumber("4321");
+    transaction->setValue(15);
+    exporter->addTransaction(transaction);
+
+    QString data;
+    QTextStream in;
+    in.setString(&data);
+
+    exporter->createDtausStream(&in);
+
+    QDate date = QDate::currentDate();
+
+    QCOMPARE(data, QString("0128ALK3005011000000000DORF E.V.                  %1    00001234560000000000"
+                           "                                               10187C30050110400502200000004321000000000000000000"
+                           " 0000000000030050110000012345600000001500                                      "
+                           "DORF E.V.                                             1  00                                        "
+                           "                             0128E     0000001000000000000000000000000004321000000000400502200000000001500"
+                           "                                                   ").arg(date.toString("ddMMyy")));
 }
 
 }

@@ -5,9 +5,11 @@
 
 #include <QObject>
 #include <QString>
+#include <QTextStream>
 #include <QSharedPointer>
 
-#include "transaction.h"
+#include "state.h"
+#include "dtaus/transaction.h"
 
 namespace qaqbanking {
 namespace dtaus {
@@ -21,7 +23,13 @@ public:
     virtual ~Exporter();
 
     void addTransaction(const QSharedPointer<Transaction> transaction);
-    void createDtausFile(const QString &aFilename);
+    bool createDtausFile(const QString &filename);
+    bool createDtausStream(QTextStream *stream);
+
+    State lastState() const;
+
+signals:
+    void logMessage(QString message);
 
 private:
     class ExporterImpl;

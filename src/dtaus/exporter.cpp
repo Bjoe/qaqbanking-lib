@@ -3,12 +3,15 @@
 #include <functional>
 
 #include <QByteArray>
+#include <QDebug>
 
 #include <aqbanking/imexporter.h>
 #include <aqbanking/banking.h>
 #include <aqbanking/transaction.h>
 #include <aqbanking/value.h>
 #include <gwenhywfar/buffer.h>
+
+#include "state.h"
 
 namespace qaqbanking {
 namespace dtaus {
@@ -20,20 +23,67 @@ static void convertToChar(const QString &string, std::function<void(const char*)
     setChar(data);
 }
 
-struct Exporter::ExporterImpl
+class Exporter::ExporterImpl
 {
-      AB_IMEXPORTER_ACCOUNTINFO* m_accountInfo;
-      AB_IMEXPORTER_CONTEXT* m_exporterContext;
+public:
+    ExporterImpl() :
+        m_exporterContext(AB_ImExporterContext_new()),
+        m_accountInfo(AB_ImExporterAccountInfo_new())
+    {
+        AB_ImExporterContext_AddAccountInfo(m_exporterContext, m_accountInfo);
+    }
+
+    ~ExporterImpl()
+    {
+        AB_ImExporterAccountInfo_free(m_accountInfo);
+        AB_ImExporterContext_free(m_exporterContext);
+    }
+
+    bool createDtaus(std::function<int(AB_BANKING*, AB_IMEXPORTER_CONTEXT*)> exportCb)
+    {
+        AB_BANKING *abBanking = AB_Banking_new("QAqBanking", 0, 0);
+        int result = AB_Banking_Init(abBanking);
+        if(result != 0) {
+            m_state = State(tr("AqBankining Initialisierung Fehler"), result);
+            //logCb(m_state.message());
+            return false;
+        }
+
+        bool ret = true;
+        result = exportCb(abBanking, m_exporterContext);
+        if(result != 0) {
+            m_state = State(tr("Export error"), result);
+            //logCb(m_state.message());
+            ret = false;
+        } else {
+            QString message(AB_ImExporterContext_GetLog(m_exporterContext));
+            //logCb(message);
+        }
+
+        AB_Banking_free(abBanking);
+        return ret;
+    }
+
+    AB_IMEXPORTER_ACCOUNTINFO* accountInfo() const
+    {
+        return m_accountInfo;
+    }
+
+    State state() const
+    {
+        return m_state;
+    }
+
+private:
+    AB_IMEXPORTER_CONTEXT* m_exporterContext;
+    AB_IMEXPORTER_ACCOUNTINFO* m_accountInfo;
+    State m_state;
 };
 
 Exporter::Exporter(const QString &anAccountNumber, const QString &aBankName, const QString &aBankCode, const QString &aCurrency) :
     m_p(new ExporterImpl)
 {
-    m_p->m_exporterContext = AB_ImExporterContext_new();
-    m_p->m_accountInfo = AB_ImExporterAccountInfo_new();
-    AB_ImExporterContext_AddAccountInfo(m_p->m_exporterContext, m_p->m_accountInfo);
-
-    AB_IMEXPORTER_ACCOUNTINFO* accountInfo = m_p->m_accountInfo;
+    AB_IMEXPORTER_ACCOUNTINFO* accountInfo = m_p->accountInfo();
 
     convertToChar(anAccountNumber,
                   [accountInfo](const char* data) { AB_ImExporterAccountInfo_SetAccountNumber(accountInfo, data); });
@@ -50,8 +100,6 @@ Exporter::Exporter(const QString &anAccountNumber, const QString &aBankName, con
 
 Exporter::~Exporter()
 {
-    AB_ImExporterAccountInfo_free(m_p->m_accountInfo);
-    AB_ImExporterContext_free(m_p->m_exporterContext);
 }
 
 void Exporter::addTransaction(const QSharedPointer<Transaction> transaction)
@@ -84,46 +132,54 @@ void Exporter::addTransaction(const QSharedPointer<Transaction> transaction)
     AB_Value_free(value);
     AB_Transaction_SetTextKey(abTransaction, transaction->textKey());
 
-    AB_ImExporterAccountInfo_AddTransaction(m_p->m_accountInfo, abTransaction);
+    AB_ImExporterAccountInfo_AddTransaction(m_p->accountInfo(), abTransaction);
 }
 
-void Exporter::createDtausFile(const QString &aFilename)
+bool Exporter::createDtausFile(const QString &filename)
 {
-    AB_BANKING *abBanking = AB_Banking_new("QAqBanking", 0, 0);
-    int result = AB_Banking_Init(abBanking);
-    if(result != 0) {
-//        std::cerr << "Error " << result << std::endl;
-        return;
-    }
+    const QByteArray ascii = filename.toLocal8Bit();
 
-    const QByteArray ascii = aFilename.toLocal8Bit();
-    result = AB_Banking_ExportToFile(abBanking, m_p->m_exporterContext, "dtaus", "debitnote", ascii.constData());
-    if(result != 0) {
- //       std::cerr << "Export Error " << result << std::endl;
-    } /*else {
-        const char *log = AB_ImExporterContext_GetLog(imExportContext);
-        std::cout << "Export Log " << *log << std::endl;
-    } */
+    return m_p->createDtaus(
 
-    AB_Banking_free(abBanking);
+        [ascii] (AB_BANKING* abBanking, AB_IMEXPORTER_CONTEXT* imExporterContext) -> int
+        {
+            return AB_Banking_ExportToFile(abBanking, imExporterContext, "dtaus", "debitnote", ascii.constData());
+        }
+    );
 }
 
-/*
-  AB_BANKING *abBanking = AB_Banking_new("QAqBanking", 0, 0);
+bool Exporter::createDtausStream(QTextStream *stream)
+{
+    GWEN_BUFFER* gwBuffer = GWEN_Buffer_new(NULL, 2048, 0, 1);
 
-  GWEN_BUFFER* gwBuffer = GWEN_Buffer_new(NULL, 0, 0, 0);
-  result = AB_Banking_ExportToBuffer(abBanking, m_p->m_exporterContext, "dtaus", "debitnote", gwBuffer);
+    bool result = m_p->createDtaus(
 
+        [gwBuffer] (AB_BANKING* abBanking, AB_IMEXPORTER_CONTEXT* imExporterContext) -> int
+        {
+            return AB_Banking_ExportToBuffer(abBanking, imExporterContext, "dtaus", "debitnote", gwBuffer);
+        }
+    );
 
+    uint32_t size = GWEN_Buffer_GetUsedBytes(gwBuffer);
+    if(size) {
+        QByteArray buffer;
+        buffer.resize(size);
+        GWEN_Buffer_Rewind(gwBuffer);
+        GWEN_Buffer_ReadBytes(gwBuffer, buffer.data(), &size);
+        *stream << buffer;
+    } else {
+        emit logMessage(QString("No data to export."));
+        result = false;
+    }
+    GWEN_Buffer_free(gwBuffer);
 
-  QTextStream stream;
+    return result;
+}
 
-  stream << gwBuffer;
+State Exporter::lastState() const
+{
+    return m_p->state();
+}
 
-
-
-  GWEN_Buffer_free(gwBuffer);
-  AB_Banking_free(abBanking);
-*/
 }
 }
