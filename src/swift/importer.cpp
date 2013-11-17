@@ -61,6 +61,7 @@ public:
         if(result != 0) {
             m_state = State(tr("AqBankining Initialisierung Fehler"), result);
             logCb(m_state.message());
+            AB_Banking_free(abBanking);
             return false;
         }
 
@@ -71,10 +72,9 @@ public:
             cleanUpCb();
             AB_Banking_free(abBanking);
             return false;
-        } else {
-            QString message(AB_ImExporterContext_GetLog(m_imExporterContext));
-            logCb(message);
         }
+        QString message(AB_ImExporterContext_GetLog(m_imExporterContext));
+        logCb(message);
 
         const QByteArray bankCodeAscii = m_bankCode.toLocal8Bit();
         const QByteArray accountNumberAscii = m_accountNumber.toLocal8Bit();
@@ -105,6 +105,9 @@ public:
         } else {
             logCb("Es wurden keine Daten gefunden");
         }
+        message = QString(AB_ImExporterContext_GetLog(m_imExporterContext));
+        logCb(message);
+
         cleanUpCb();
         AB_Banking_free(abBanking);
         return true;

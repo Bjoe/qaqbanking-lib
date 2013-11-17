@@ -47,6 +47,7 @@ public:
         if(result != 0) {
             m_state = State(tr("AqBankining Initialisierung Fehler"), result);
             logCb(m_state.message());
+            AB_Banking_free(abBanking);
             return false;
         }
 
@@ -56,10 +57,9 @@ public:
             m_state = State(tr("Export error"), result);
             logCb(m_state.message());
             ret = false;
-        } else {
-            QString message(AB_ImExporterContext_GetLog(m_exporterContext));
-            logCb(message);
         }
+        QString message(AB_ImExporterContext_GetLog(m_exporterContext));
+        logCb(message);
 
         AB_Banking_free(abBanking);
         return ret;

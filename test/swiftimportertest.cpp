@@ -3,7 +3,9 @@
 #include <QList>
 #include <QTextStream>
 #include <QSharedPointer>
+#include <QSignalSpy>
 
+#include "state.h"
 #include "swift/importer.h"
 #include "swift/transaction.h"
 
@@ -20,6 +22,7 @@ private slots:
     void testReadSwift();
     void testReadStreamSwift();
     void testReadStreamSwiftWithImportCallback();
+    void testReadEmptyData();
 };
 
 void SwiftImporterTest::testReadSwift()
@@ -129,6 +132,29 @@ void SwiftImporterTest::testReadStreamSwiftWithImportCallback()
     QCOMPARE(transaction->primanota(), QString("7000"));
 
     transactions.clear();
+}
+
+void SwiftImporterTest::testReadEmptyData()
+{
+    QString data;
+    QTextStream stream;
+    stream.setString(&data);
+    qaqbanking::swift::Importer importer("29485723", "0932104953");
+
+    QSignalSpy spy(&importer, SIGNAL(logMessage(QString)));
+
+    QList<QSharedPointer<qaqbanking::swift::Transaction> > transactions;
+    bool result = importer.importMt940Swift(&stream,
+        [&transactions] (QSharedPointer<qaqbanking::swift::Transaction> transaction)
+        {
+            transactions.append(transaction);
+        }
+    );
+
+    QCOMPARE(spy.count(), 1);
+
+    qaqbanking::State state = importer.lastState();
+    QVERIFY(state.type() == qaqbanking::State::UnknownError);
 }
 
 }
