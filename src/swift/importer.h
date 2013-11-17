@@ -21,7 +21,7 @@ class Importer : public QObject
     Q_OBJECT
 
 public:
-    Importer(const QString bankCode, const QString accountNumber);
+    Importer(const QString bankCode, const QString accountNumber, QObject *parent = 0);
     ~Importer();
 
     QList<QSharedPointer<Transaction> > importMt940Swift(const QString filename);

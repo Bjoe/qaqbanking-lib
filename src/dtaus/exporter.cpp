@@ -80,8 +80,8 @@ private:
     State m_state;
 };
 
-Exporter::Exporter(const QString &anAccountNumber, const QString &aBankName, const QString &aBankCode, const QString &aCurrency) :
-    m_p(new ExporterImpl)
+Exporter::Exporter(const QString &anAccountNumber, const QString &aBankName, const QString &aBankCode, const QString &aCurrency, QObject *parent) :
+    QObject(parent), m_p(new ExporterImpl)
 {
     AB_IMEXPORTER_ACCOUNTINFO* accountInfo = m_p->accountInfo();
 

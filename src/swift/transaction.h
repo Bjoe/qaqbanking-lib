@@ -15,7 +15,7 @@ class Transaction : public QObject
     Q_OBJECT
 
 public:
-    Transaction();
+    Transaction(QObject *parent = 0);
     virtual ~Transaction();
 
     void setRemoteName(QString remoteName);

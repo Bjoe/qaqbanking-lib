@@ -123,8 +123,8 @@ private:
     State m_state;
 };
 
-Importer::Importer(const QString bankCode, const QString accountNumber)
-    : m_p(new ImporterImpl(bankCode, accountNumber))
+Importer::Importer(const QString bankCode, const QString accountNumber, QObject *parent)
+    : QObject(parent), m_p(new ImporterImpl(bankCode, accountNumber))
 {}
 
 Importer::~Importer()

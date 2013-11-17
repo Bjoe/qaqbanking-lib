@@ -16,7 +16,7 @@ struct Transaction::TransactionImpl {
 };
 
 
-Transaction::Transaction() : m_p(new TransactionImpl)
+Transaction::Transaction(QObject *parent) : QObject(parent), m_p(new TransactionImpl)
 {
 }
 

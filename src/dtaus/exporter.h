@@ -19,7 +19,7 @@ class Exporter : public QObject
     Q_OBJECT
 
 public:
-    Exporter(const QString &anAccountNumber, const QString &aBankName, const QString &aBankCode, const QString &aCurrency);
+    Exporter(const QString &anAccountNumber, const QString &aBankName, const QString &aBankCode, const QString &aCurrency, QObject *parent = 0);
     virtual ~Exporter();
 
     void addTransaction(const QSharedPointer<Transaction> transaction);
