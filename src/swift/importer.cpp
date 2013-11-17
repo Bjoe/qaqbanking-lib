@@ -134,6 +134,8 @@ QList<QSharedPointer<Transaction> > Importer::importMt940Swift(const QString fil
 {
     const QByteArray ascii = filename.toLocal8Bit();
 
+    Importer* instance = this;
+
     QList<QSharedPointer<Transaction> > transactionList;
     m_p->importMt940Swift(
 
@@ -147,9 +149,9 @@ QList<QSharedPointer<Transaction> > Importer::importMt940Swift(const QString fil
             transactionList.append(transaction);
         },
 
-        [] (QString message)
+        [instance] (QString message)
         {
-            //logMessage(message);
+            emit instance->logMessage(message);
         }
     );
 
@@ -177,6 +179,8 @@ bool Importer::importMt940Swift(QTextStream *stream, std::function<void (QShared
     buffer.append(stream->readAll());
     GWEN_BUFFER* gwBuffer = GWEN_Buffer_new(buffer.data(), buffer.size(), buffer.size(), 0);
 
+    Importer* instance = this;
+
     return m_p->importMt940Swift(
 
         [gwBuffer] (AB_BANKING* abBanking, AB_IMEXPORTER_CONTEXT* imExporterContext) -> int
@@ -186,9 +190,9 @@ bool Importer::importMt940Swift(QTextStream *stream, std::function<void (QShared
 
         importCb,
 
-        [] (QString message)
+        [instance] (QString message)
         {
-            //logMessage(message);
+            emit instance->logMessage(message);
         },
         [gwBuffer]()
         {

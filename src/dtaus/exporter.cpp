@@ -39,13 +39,14 @@ public:
         AB_ImExporterContext_free(m_exporterContext);
     }
 
-    bool createDtaus(std::function<int(AB_BANKING*, AB_IMEXPORTER_CONTEXT*)> exportCb)
+    bool createDtaus(std::function<int(AB_BANKING*, AB_IMEXPORTER_CONTEXT*)> exportCb,
+                     std::function<void(QString)> logCb)
     {
         AB_BANKING *abBanking = AB_Banking_new("QAqBanking", 0, 0);
         int result = AB_Banking_Init(abBanking);
         if(result != 0) {
             m_state = State(tr("AqBankining Initialisierung Fehler"), result);
-            //logCb(m_state.message());
+            logCb(m_state.message());
             return false;
         }
 
@@ -53,11 +54,11 @@ public:
         result = exportCb(abBanking, m_exporterContext);
         if(result != 0) {
             m_state = State(tr("Export error"), result);
-            //logCb(m_state.message());
+            logCb(m_state.message());
             ret = false;
         } else {
             QString message(AB_ImExporterContext_GetLog(m_exporterContext));
-            //logCb(message);
+            logCb(message);
         }
 
         AB_Banking_free(abBanking);
@@ -139,11 +140,18 @@ bool Exporter::createDtausFile(const QString &filename)
 {
     const QByteArray ascii = filename.toLocal8Bit();
 
+    Exporter* instance = this;
+
     return m_p->createDtaus(
 
         [ascii] (AB_BANKING* abBanking, AB_IMEXPORTER_CONTEXT* imExporterContext) -> int
         {
             return AB_Banking_ExportToFile(abBanking, imExporterContext, "dtaus", "debitnote", ascii.constData());
+        },
+
+        [instance] (QString message)
+        {
+            emit instance->logMessage(message);
         }
     );
 }
@@ -152,12 +160,20 @@ bool Exporter::createDtausStream(QTextStream *stream)
 {
     GWEN_BUFFER* gwBuffer = GWEN_Buffer_new(NULL, 2048, 0, 1);
 
+    Exporter* instance = this;
+
     bool result = m_p->createDtaus(
 
         [gwBuffer] (AB_BANKING* abBanking, AB_IMEXPORTER_CONTEXT* imExporterContext) -> int
         {
             return AB_Banking_ExportToBuffer(abBanking, imExporterContext, "dtaus", "debitnote", gwBuffer);
+        },
+
+        [instance] (QString message)
+        {
+            emit instance->logMessage(message);
         }
+
     );
 
     uint32_t size = GWEN_Buffer_GetUsedBytes(gwBuffer);
