@@ -2,6 +2,7 @@
 #define QIABANKING_SWIFT_IMPORTER_H
 
 #include <memory>
+#include <functional>
 
 #include <QObject>
 #include <QString>
@@ -25,6 +26,8 @@ public:
 
     QList<QSharedPointer<Transaction> > importMt940Swift(const QString filename);
     QList<QSharedPointer<Transaction> > importMt940Swift(QTextStream *stream);
+
+    bool importMt940Swift(QTextStream *stream, std::function<void(QSharedPointer<Transaction>)> importCb);
 
     State lastState() const;
 

@@ -2,7 +2,6 @@
 
 #include <QByteArray>
 
-#include <functional>
 #include <time.h>
 
 #include <aqbanking/imexporter.h>
@@ -52,30 +51,29 @@ public:
         AB_ImExporterContext_free(m_imExporterContext);
     }
 
-    QList<QSharedPointer<Transaction> > importMt940Swift(std::function<int(AB_BANKING*, AB_IMEXPORTER_CONTEXT*)> import,
-                                                         std::function<void(QString)> log,
-                                                         std::function<void()> cleanUp = [](){})
+    bool importMt940Swift(std::function<int(AB_BANKING*, AB_IMEXPORTER_CONTEXT*)> importCb,
+                          std::function<void(QSharedPointer<Transaction>)> importTransactionCb,
+                          std::function<void(QString)> logCb,
+                          std::function<void()> cleanUpCb = [](){})
     {
-        QList<QSharedPointer<Transaction> > transactionList;
-
         AB_BANKING *abBanking = AB_Banking_new("QAqBanking", 0, 0);
         int result = AB_Banking_Init(abBanking);
         if(result != 0) {
             m_state = State(tr("AqBankining Initialisierung Fehler"), result);
-            log(m_state.message());
-            return transactionList;
+            logCb(m_state.message());
+            return false;
         }
 
-        result = import(abBanking, m_imExporterContext);
+        result = importCb(abBanking, m_imExporterContext);
         if(result != 0) {
             m_state = State(tr("Import error"), result);
-            log(m_state.message());
-            cleanUp();
+            logCb(m_state.message());
+            cleanUpCb();
             AB_Banking_free(abBanking);
-            return transactionList;
+            return false;
         } else {
             QString message(AB_ImExporterContext_GetLog(m_imExporterContext));
-            log(message);
+            logCb(message);
         }
 
         const QByteArray bankCodeAscii = m_bankCode.toLocal8Bit();
@@ -98,18 +96,18 @@ public:
                 transaction->setTransactionCode(AB_Transaction_GetTransactionCode(abTransaction));
                 transaction->setPrimanota(QString(AB_Transaction_GetPrimanota(abTransaction)));
 
-                transactionList.append(transaction);
+                importTransactionCb(transaction);
 
                 AB_Transaction_free(abTransaction);
                 abTransaction = AB_ImExporterAccountInfo_GetNextTransaction(accountInfo);
             }
             AB_ImExporterAccountInfo_free(accountInfo);
         } else {
-            log("Es wurden keine Daten gefunden");
+            logCb("Es wurden keine Daten gefunden");
         }
-        cleanUp();
+        cleanUpCb();
         AB_Banking_free(abBanking);
-        return transactionList;
+        return true;
     }
 
     State state() const
@@ -136,33 +134,57 @@ QList<QSharedPointer<Transaction> > Importer::importMt940Swift(const QString fil
 {
     const QByteArray ascii = filename.toLocal8Bit();
 
-    QList<QSharedPointer<Transaction> > transactionList = m_p->importMt940Swift(
+    QList<QSharedPointer<Transaction> > transactionList;
+    m_p->importMt940Swift(
 
         [ascii] (AB_BANKING* abBanking, AB_IMEXPORTER_CONTEXT* imExporterContext) -> int
         {
             return AB_Banking_ImportFileWithProfile(abBanking, "swift", imExporterContext, "SWIFT-MT940", 0, ascii.constData());
         },
 
+        [&transactionList] (QSharedPointer<Transaction> transaction)
+        {
+            transactionList.append(transaction);
+        },
+
         [] (QString message)
         {
             //logMessage(message);
-        });
+        }
+    );
 
     return transactionList;
 }
 
 QList<QSharedPointer<Transaction> > Importer::importMt940Swift(QTextStream *stream)
 {
+    QList<QSharedPointer<Transaction> > transactionList;
+
+    importMt940Swift(stream,
+
+        [&transactionList] (QSharedPointer<Transaction> transaction)
+        {
+            transactionList.append(transaction);
+        }
+    );
+
+    return transactionList;
+}
+
+bool Importer::importMt940Swift(QTextStream *stream, std::function<void (QSharedPointer<Transaction>)> importCb)
+{
     QByteArray buffer;
     buffer.append(stream->readAll());
     GWEN_BUFFER* gwBuffer = GWEN_Buffer_new(buffer.data(), buffer.size(), buffer.size(), 0);
 
-    QList<QSharedPointer<Transaction> > transactionList = m_p->importMt940Swift(
+    return m_p->importMt940Swift(
 
         [gwBuffer] (AB_BANKING* abBanking, AB_IMEXPORTER_CONTEXT* imExporterContext) -> int
         {
             return AB_Banking_ImportBuffer(abBanking, imExporterContext, "swift", "SWIFT-MT940", gwBuffer);
         },
+
+        importCb,
 
         [] (QString message)
         {
@@ -171,9 +193,9 @@ QList<QSharedPointer<Transaction> > Importer::importMt940Swift(QTextStream *stre
         [gwBuffer]()
         {
             GWEN_Buffer_free(gwBuffer);
-        });
+        }
+    );
 
-    return transactionList;
 }
 
 State Importer::lastState() const

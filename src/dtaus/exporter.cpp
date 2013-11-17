@@ -8,6 +8,7 @@
 #include <aqbanking/banking.h>
 #include <aqbanking/transaction.h>
 #include <aqbanking/value.h>
+#include <gwenhywfar/buffer.h>
 
 namespace qaqbanking {
 namespace dtaus {
@@ -30,6 +31,7 @@ Exporter::Exporter(const QString &anAccountNumber, const QString &aBankName, con
 {
     m_p->m_exporterContext = AB_ImExporterContext_new();
     m_p->m_accountInfo = AB_ImExporterAccountInfo_new();
+    AB_ImExporterContext_AddAccountInfo(m_p->m_exporterContext, m_p->m_accountInfo);
 
     AB_IMEXPORTER_ACCOUNTINFO* accountInfo = m_p->m_accountInfo;
 
@@ -87,7 +89,7 @@ void Exporter::addTransaction(const QSharedPointer<Transaction> transaction)
 
 void Exporter::createDtausFile(const QString &aFilename)
 {
-    AB_BANKING *abBanking = AB_Banking_new("Export Example", 0, 0);
+    AB_BANKING *abBanking = AB_Banking_new("QAqBanking", 0, 0);
     int result = AB_Banking_Init(abBanking);
     if(result != 0) {
 //        std::cerr << "Error " << result << std::endl;
@@ -95,7 +97,6 @@ void Exporter::createDtausFile(const QString &aFilename)
     }
 
     const QByteArray ascii = aFilename.toLocal8Bit();
-    AB_ImExporterContext_AddAccountInfo(m_p->m_exporterContext, m_p->m_accountInfo);
     result = AB_Banking_ExportToFile(abBanking, m_p->m_exporterContext, "dtaus", "debitnote", ascii.constData());
     if(result != 0) {
  //       std::cerr << "Export Error " << result << std::endl;
@@ -107,5 +108,22 @@ void Exporter::createDtausFile(const QString &aFilename)
     AB_Banking_free(abBanking);
 }
 
+/*
+  AB_BANKING *abBanking = AB_Banking_new("QAqBanking", 0, 0);
+
+  GWEN_BUFFER* gwBuffer = GWEN_Buffer_new(NULL, 0, 0, 0);
+  result = AB_Banking_ExportToBuffer(abBanking, m_p->m_exporterContext, "dtaus", "debitnote", gwBuffer);
+
+
+
+  QTextStream stream;
+
+  stream << gwBuffer;
+
+
+
+  GWEN_Buffer_free(gwBuffer);
+  AB_Banking_free(abBanking);
+*/
 }
 }
