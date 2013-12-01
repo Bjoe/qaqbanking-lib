@@ -5,6 +5,8 @@ set(HEADERS
   dtaus/exportbuilder.h
   dtaus/transactionbuilder.h
   dtaus/transaction.h
+  sepa/exporter.h
+  sepa/transaction.h
   swift/importer.h
   swift/transaction.h
 )
@@ -13,8 +15,11 @@ set(QT_SRCS
     state.cpp
     dtaus/transaction.cpp
     dtaus/exporter.cpp
+    sepa/transaction.cpp
+    sepa/exporter.cpp
     swift/importer.cpp
     swift/transaction.cpp
+    private/exporter.cpp
 )
 
 

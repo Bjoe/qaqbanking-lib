@@ -23,11 +23,14 @@ include_directories(
 
 set(test_additional_lib
     qaqbanking
-    ${AQB_LIBRARIES}
-    ${GWEN_LIBRARIES}
+    #${AQB_LIBRARIES}
+    #${GWEN_LIBRARIES}
+    ${AQB_LDFLAGS}
+    ${GWEN_LDFLAGS}
 )
 
 qt_test(transaction transactiontest.cpp)
 qt_test(exporter exportertest.cpp)
+qt_test(sepaexporter sepaexportertest.cpp)
 qt_test(swiftimporter swiftimportertest.cpp)
 qt_test(mainswift mainswifttest.cpp)
