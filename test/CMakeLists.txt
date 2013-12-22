@@ -23,8 +23,6 @@ include_directories(
 
 set(test_additional_lib
     qaqbanking
-    #${AQB_LIBRARIES}
-    #${GWEN_LIBRARIES}
     ${AQB_LDFLAGS}
     ${GWEN_LDFLAGS}
 )
