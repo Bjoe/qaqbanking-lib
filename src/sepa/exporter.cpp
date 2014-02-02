@@ -144,8 +144,6 @@ bool Exporter::createSepaDirectDebitFile(const QString filename)
 {
     const QByteArray ascii = filename.toLocal8Bit();
 
-    Exporter* instance = this;
-
     return m_p->createExport(
 
         [ascii] (AB_BANKING* abBanking, AB_IMEXPORTER_CONTEXT* imExporterContext) -> int
@@ -153,10 +151,10 @@ bool Exporter::createSepaDirectDebitFile(const QString filename)
             return AB_Banking_ExportToFile(abBanking, imExporterContext, "sepa", "008_002_02", ascii.constData());
         },
 
-        [instance] (QString message)
+        [this] (QString message)
         {
             if(!message.isEmpty()) {
-                emit instance->logMessage(message);
+                emit logMessage(message);
             }
         }
     );
@@ -166,8 +164,6 @@ bool Exporter::createSepaDirectDebitStream(QTextStream *stream)
 {
     GWEN_BUFFER* gwBuffer = GWEN_Buffer_new(NULL, 2048, 0, 1);
 
-    Exporter* instance = this;
-
     bool result = m_p->createExport(
 
         [gwBuffer] (AB_BANKING* abBanking, AB_IMEXPORTER_CONTEXT* imExporterContext) -> int
@@ -175,10 +171,10 @@ bool Exporter::createSepaDirectDebitStream(QTextStream *stream)
             return AB_Banking_ExportToBuffer(abBanking, imExporterContext, "sepa", "008_002_02", gwBuffer);
         },
 
-        [instance] (QString message)
+        [this] (QString message)
         {
             if(!message.isEmpty()) {
-                emit instance->logMessage(message);
+                emit logMessage(message);
             }
         }
 
@@ -192,7 +188,7 @@ bool Exporter::createSepaDirectDebitStream(QTextStream *stream)
         GWEN_Buffer_ReadBytes(gwBuffer, buffer.data(), &size);
         *stream << buffer;
     } else {
-        emit logMessage(QString(tr("No data to export.")));
+        emit logMessage(tr("No SEPA data to export."));
         result = false;
     }
     GWEN_Buffer_free(gwBuffer);

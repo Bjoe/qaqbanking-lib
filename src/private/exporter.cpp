@@ -22,6 +22,11 @@ Exporter::~Exporter()
 
 bool Exporter::createExport(std::function<int (AB_BANKING *, AB_IMEXPORTER_CONTEXT *)> exportCb, std::function<void (QString)> logCb)
 {
+    if(AB_ImExporterAccountInfo_GetTransactionCount(m_accountInfo) < 1) {
+        logCb(tr("No transaction data to export."));
+        return false;
+    }
+
     GWEN_GUI *gui = GWEN_Gui_CGui_new();
     GWEN_Gui_SetGui(gui);
 
