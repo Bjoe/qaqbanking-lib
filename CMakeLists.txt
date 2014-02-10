@@ -66,24 +66,46 @@ export(TARGETS qaqbanking
 # (this registers the build-tree with a global CMake-registry)
 export(PACKAGE QAqBanking)
 
-# Create the QAqBankingConfig.cmake and QAqBankingConfigVersion.cmake files
+
+
+##################################################################
+# Create the xxxxxxConfig.cmake and xxxxxxConfigVersion.cmake files
+
+#-----------------------------------------------------------------
 # ... for the build tree
-set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src" "${PROJECT_BINARY_DIR}")
-configure_file(QAqBankingConfig.cmake.in
-  "${PROJECT_BINARY_DIR}/QAqBankingConfig.cmake" @ONLY)
+set(CONF_INCLUDE_DIRS
+  "${PROJECT_SOURCE_DIR}/src"
+  "${PROJECT_BINARY_DIR}"
+)
+configure_file(
+  "QAqBankingConfig.cmake.in"
+  "${PROJECT_BINARY_DIR}/QAqBankingConfig.cmake" @ONLY
+)
 
+#-----------------------------------------------------------------
 # ... for the install tree
-file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
-   "${INSTALL_INCLUDE_DIR}")
-set(CONF_INCLUDE_DIRS "\${QPJSIP_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-configure_file(QAqBankingConfig.cmake.in
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/QAqBankingConfig.cmake" @ONLY)
+file(RELATIVE_PATH 
+  REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
+  "${INSTALL_INCLUDE_DIR}"
+)  
+set(CONF_INCLUDE_DIRS 
+  "\${QAQBANKING_CMAKE_DIR}/${REL_INCLUDE_DIR}"
+)
+configure_file(
+  "QAqBankingConfig.cmake.in"
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/QAqBankingConfig.cmake" @ONLY
+)
 
+#-----------------------------------------------------------------
 # ... for both
-configure_file(QAqBankingConfigVersion.cmake.in
-  "${PROJECT_BINARY_DIR}/QAqBankingConfigVersion.cmake" @ONLY)
- 
-# Install the QAqBankingConfig.cmake and QAqBankingConfigVersion.cmake
+configure_file(
+  "QAqBankingConfigVersion.cmake.in"
+  "${PROJECT_BINARY_DIR}/QAqBankingConfigVersion.cmake" @ONLY
+)
+
+
+##################################################################
+# Install the xxxxxxConfig.cmake and xxxxxxConfigVersion.cmake
 install(FILES
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/QAqBankingConfig.cmake"
   "${PROJECT_BINARY_DIR}/QAqBankingConfigVersion.cmake"
